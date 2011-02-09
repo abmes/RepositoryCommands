@@ -69,7 +69,7 @@ var
 implementation
 
 uses
-  dwJumpLists, Registry, Math, fConfig, JclStrings, uUtils;
+  dwJumpLists, Registry, Math, fConfig, JclStrings, uUtils, StrUtils;
 
 const
   RegKeySembaSVNProjects = 'Software\SEMBA\SembaSVNProjects';
@@ -86,6 +86,7 @@ const
   ProjectsGridRowHeight = 21;
   ProjectNameColumnWidth = 150;
   CommandColumnWidth = 80;
+  NearMousePositionTolerancePixelCount = 20;
 
 {$R *.dfm}
 
@@ -93,7 +94,7 @@ function TfmMain.GetDefaultTortoiseProcFileName: string;
 
   function GetFullTortoiseProcFileName(const AEnvVarProgramFiles: string): string;
   begin
-    Result:= GetEnvironmentVariable(AEnvVarProgramFiles) + DefaultTortoiseProcFileName;
+    Result:= ExcludeTrailingPathDelimiter(GetEnvironmentVariable(AEnvVarProgramFiles)) + DefaultTortoiseProcFileName;
   end;
 
 begin
@@ -333,7 +334,7 @@ begin
   FSavedMousePos:= Mouse.CursorPos;
   FIsNearMousePosition:=
     IsTaskBarAtBottom and
-    InRange(FSavedMousePos.Y, Screen.Height - GetTaskBarHeight + 1, Screen.Height);
+    InRange(FSavedMousePos.Y, Screen.Height - GetTaskBarHeight - NearMousePositionTolerancePixelCount, Screen.Height);
 
   RefreshProjectCommands;
 end;
@@ -391,8 +392,11 @@ procedure TfmMain.grdProjectCommandsCellClick(Column: TColumnEh);
 var
   Arguments: string;
 begin
-  if not cdsSVNCommands.Locate('COMMAND_NO', StrToInt(GetLastToken(Column.FieldName, '_')), []) then
+  if not StartsStr('CMD_', Column.FieldName) then
     Exit;
+
+  if not cdsSVNCommands.Locate('COMMAND_NO', StrToInt(GetLastToken(Column.FieldName, '_')), []) then
+    raise Exception.Create('Internal error: Command not found');
 
   Arguments:=
     StringReplace(
