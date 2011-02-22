@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, DB, SembaFields, DBClient, SembaClientDataSet, DBGridEh, SembaDBGrid,
-  Buttons, ActnList, AppEvnts, ExtCtrls, GridsEh;
+  Buttons, ActnList, AppEvnts, ExtCtrls, GridsEh, DBGridEhGrouping;
 
 type
   TfmMain = class(TForm)
@@ -83,10 +83,10 @@ const
   DefaultTortoiseProcFileName = '\TortoiseSVN\bin\TortoiseProc.exe';
   CommandPrefix = 'CMD_';
   ProjectPathMacro = '%ProjectDir%';
-  ProjectsGridRowHeight = 21;
-  ProjectNameColumnWidth = 150;
+  ProjectsGridRowHeight = 25;
+  ProjectNameColumnWidth = 200;
   CommandColumnWidth = 80;
-  NearMousePositionTolerancePixelCount = 20;
+  NearMousePositionTolerancePixelCount = 30;
 
 {$R *.dfm}
 
@@ -258,7 +258,7 @@ procedure TfmMain.RefreshGridColumns;
     col:= grdProjectCommands.Columns.Add;
     col.FieldName:= AFieldName;
     col.Width:= AWidth;
-    col.Font.Size:= 10;
+    col.Font.Size:= 11;
     if AIsCommandColumn then
       begin
         col.Alignment:= taCenter;
