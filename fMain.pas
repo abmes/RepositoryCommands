@@ -310,11 +310,19 @@ begin
 end;
 
 procedure TfmMain.SetFormPosition;
+
+  function CalcLeft: Integer;
+  begin
+    Result:= FSavedMousePos.X - ProjectNameColumnWidth - ((cdsSVNCommands.RecordCount * CommandColumnWidth) div 2);
+    Result:= Max(Result, 0);
+    Result:= Min(Result, Screen.Width - Width);
+  end;
+
 begin
   if FIsNearMousePosition then
     begin
       Position:= poDesigned;
-      Left:= FSavedMousePos.X - (Width div 2);
+      Left:= CalcLeft;
       Top:= Screen.Height - GetTaskBarHeight - Height;
     end;
 end;
