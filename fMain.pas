@@ -400,8 +400,10 @@ procedure TfmMain.grdProjectCommandsCellClick(Column: TColumnEh);
 var
   Arguments: string;
 begin
-  if not StartsStr('CMD_', Column.FieldName) then
-    Exit;
+  if (Column.FieldName = 'PROJECT_NAME') then
+    OpenDirectoryAndHalt(cdsProjectCommands.FieldByName('PROJECT_DIR').AsString);
+
+  Assert(StartsStr('CMD_', Column.FieldName));
 
   if not cdsSVNCommands.Locate('COMMAND_NO', StrToInt(GetLastToken(Column.FieldName, '_')), []) then
     raise Exception.Create('Internal error: Command not found');
