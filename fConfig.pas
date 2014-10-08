@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, DB, StdCtrls, Buttons, ExtCtrls, GridsEh, DBGridEh, SembaDBGrid, DBCtrls,
-  ActnList, ColorNavigator, JvBaseDlg, JvSelectDirectory, ImgList, Mask, JvExMask, JvToolEdit;
+  ActnList, ColorNavigator, JvBaseDlg, JvSelectDirectory, ImgList, Mask, JvExMask, JvToolEdit, DBGridEhGrouping;
 
 type
   TMoveDirection = (mdUp, mdDown);

@@ -34,10 +34,8 @@ object fmConfig: TfmConfig
       Width = 83
       Height = 25
       Anchors = [akTop, akRight]
-      DoubleBuffered = True
       Kind = bkCancel
       NumGlyphs = 2
-      ParentDoubleBuffered = False
       TabOrder = 0
     end
     object btnOk: TBitBtn
@@ -46,10 +44,8 @@ object fmConfig: TfmConfig
       Width = 83
       Height = 25
       Anchors = [akTop, akRight]
-      DoubleBuffered = True
       Kind = bkOK
       NumGlyphs = 2
-      ParentDoubleBuffered = False
       TabOrder = 1
     end
   end
@@ -110,9 +106,9 @@ object fmConfig: TfmConfig
       FooterFont.Height = -11
       FooterFont.Name = 'Tahoma'
       FooterFont.Style = []
+      IndicatorOptions = [gioShowRowIndicatorEh]
       Options = [dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
       OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghExtendVertLines]
-      RowDetailPanel.Color = clBtnFace
       TabOrder = 0
       TitleFont.Charset = DEFAULT_CHARSET
       TitleFont.Color = clWindowText
@@ -153,19 +149,9 @@ object fmConfig: TfmConfig
       Height = 25
       DataSource = dsProjects
       VisibleButtons = [nbInsert, nbDelete]
+      Kind = dbnHorizontal
       TabOrder = 1
       BeforeAction = navProjectsBeforeAction
-      GlyphColors.Colors = (
-        0
-        0
-        0
-        0
-        16711680
-        255
-        16711680
-        16711680
-        255
-        32768)
     end
   end
   object gbSVNCommands: TGroupBox
@@ -210,9 +196,9 @@ object fmConfig: TfmConfig
       FooterFont.Height = -11
       FooterFont.Name = 'Tahoma'
       FooterFont.Style = []
+      IndicatorOptions = [gioShowRowIndicatorEh]
       Options = [dgEditing, dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
       OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghExtendVertLines]
-      RowDetailPanel.Color = clBtnFace
       TabOrder = 0
       TitleFont.Charset = DEFAULT_CHARSET
       TitleFont.Color = clWindowText
@@ -253,18 +239,8 @@ object fmConfig: TfmConfig
       Height = 25
       DataSource = dsSVNCommands
       VisibleButtons = [nbInsert, nbDelete]
+      Kind = dbnHorizontal
       TabOrder = 1
-      GlyphColors.Colors = (
-        0
-        0
-        0
-        0
-        16711680
-        255
-        16711680
-        16711680
-        255
-        32768)
     end
   end
   object dsSVNCommands: TDataSource
@@ -310,7 +286,7 @@ object fmConfig: TfmConfig
   object ilActions: TImageList
     Left = 320
     Bitmap = {
-      494C0101020008001C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000800200010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

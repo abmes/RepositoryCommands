@@ -1,6 +1,7 @@
 program SembaSVNProjects;
 
 uses
+  MidasLib,
   Forms,
   Dialogs,
   fMain in 'fMain.pas' {fmMain},

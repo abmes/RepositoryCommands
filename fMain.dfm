@@ -46,10 +46,10 @@ object fmMain: TfmMain
       FooterFont.Name = 'Tahoma'
       FooterFont.Style = []
       HorzScrollBar.Visible = False
+      IndicatorOptions = []
       OddRowColor = clCream
       Options = [dgTabs, dgConfirmDelete, dgCancelOnExit]
       OptionsEh = [dghFixed3D, dghClearSelection, dghDialogFind, dghExtendVertLines]
-      RowDetailPanel.Color = clBtnFace
       RowHeight = 18
       TabOrder = 0
       TitleFont.Charset = DEFAULT_CHARSET
