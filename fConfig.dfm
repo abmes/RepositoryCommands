@@ -69,6 +69,7 @@ object fmConfig: TfmConfig
       DirectInput = False
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
+      Text = ''
     end
   end
   object gbProjects: TGroupBox
@@ -97,27 +98,17 @@ object fmConfig: TfmConfig
       Top = 48
       Width = 481
       Height = 171
-      DataGrouping.GroupLevels = <>
       DataSource = dsProjects
-      Flat = False
-      FooterColor = clWindow
-      FooterFont.Charset = DEFAULT_CHARSET
-      FooterFont.Color = clWindowText
-      FooterFont.Height = -11
-      FooterFont.Name = 'Tahoma'
-      FooterFont.Style = []
+      DynProps = <>
+      FooterParams.Color = clWindow
       IndicatorOptions = [gioShowRowIndicatorEh]
       Options = [dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
       OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghExtendVertLines]
       TabOrder = 0
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      UseMultiTitle = True
+      TitleParams.MultiTitle = True
       Columns = <
         item
+          DynProps = <>
           EditButtons = <>
           FieldName = 'PROJECT_NAME'
           Footers = <>
@@ -125,6 +116,7 @@ object fmConfig: TfmConfig
           Width = 146
         end
         item
+          DynProps = <>
           EditButtons = <>
           FieldName = 'PROJECT_DIR'
           Footers = <>
@@ -133,6 +125,7 @@ object fmConfig: TfmConfig
         end
         item
           Checkboxes = True
+          DynProps = <>
           EditButtons = <>
           FieldName = 'IS_FAVORITE'
           Footers = <>
@@ -149,17 +142,16 @@ object fmConfig: TfmConfig
       Height = 25
       DataSource = dsProjects
       VisibleButtons = [nbInsert, nbDelete]
-      Kind = dbnHorizontal
       TabOrder = 1
       BeforeAction = navProjectsBeforeAction
     end
   end
-  object gbSVNCommands: TGroupBox
+  object gbSCMCommands: TGroupBox
     Left = 8
     Top = 312
     Width = 529
     Height = 177
-    Caption = ' SVN Commands '
+    Caption = ' SCM Commands '
     TabOrder = 3
     object btnMoveCommandDown: TSpeedButton
       Left = 500
@@ -182,32 +174,22 @@ object fmConfig: TfmConfig
       Height = 13
       Caption = 'Possible Macro: %ProjectDir%'
     end
-    object grdSVNCommands: TSembaDBGrid
+    object grdSCMCommands: TSembaDBGrid
       Left = 16
       Top = 48
       Width = 481
       Height = 117
-      DataGrouping.GroupLevels = <>
-      DataSource = dsSVNCommands
-      Flat = False
-      FooterColor = clWindow
-      FooterFont.Charset = DEFAULT_CHARSET
-      FooterFont.Color = clWindowText
-      FooterFont.Height = -11
-      FooterFont.Name = 'Tahoma'
-      FooterFont.Style = []
+      DataSource = dsSCMCommands
+      DynProps = <>
+      FooterParams.Color = clWindow
       IndicatorOptions = [gioShowRowIndicatorEh]
       Options = [dgEditing, dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
       OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghExtendVertLines]
       TabOrder = 0
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      UseMultiTitle = True
+      TitleParams.MultiTitle = True
       Columns = <
         item
+          DynProps = <>
           EditButtons = <>
           FieldName = 'COMMAND_NAME'
           Footers = <>
@@ -215,6 +197,7 @@ object fmConfig: TfmConfig
           Width = 146
         end
         item
+          DynProps = <>
           EditButtons = <>
           FieldName = 'COMMAND_ARGUMENTS'
           Footers = <>
@@ -223,6 +206,7 @@ object fmConfig: TfmConfig
         end
         item
           Checkboxes = True
+          DynProps = <>
           EditButtons = <>
           FieldName = 'IS_FAVORITE'
           Footers = <>
@@ -232,18 +216,17 @@ object fmConfig: TfmConfig
       object RowDetailData: TRowDetailPanelControlEh
       end
     end
-    object navSVNCommands: TDBColorNavigator
+    object navSCMCommands: TDBColorNavigator
       Left = 16
       Top = 22
       Width = 56
       Height = 25
-      DataSource = dsSVNCommands
+      DataSource = dsSCMCommands
       VisibleButtons = [nbInsert, nbDelete]
-      Kind = dbnHorizontal
       TabOrder = 1
     end
   end
-  object dsSVNCommands: TDataSource
+  object dsSCMCommands: TDataSource
     Left = 240
   end
   object dsProjects: TDataSource
@@ -286,7 +269,7 @@ object fmConfig: TfmConfig
   object ilActions: TImageList
     Left = 320
     Bitmap = {
-      494C010102000800200010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000500040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

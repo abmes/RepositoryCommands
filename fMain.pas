@@ -5,24 +5,24 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, DB, SembaFields, DBClient, SembaClientDataSet, DBGridEh, SembaDBGrid,
-  Buttons, ActnList, AppEvnts, ExtCtrls, GridsEh, DBGridEhGrouping;
+  Buttons, ActnList, AppEvnts, ExtCtrls, GridsEh, DBGridEhGrouping, System.Actions, DBAxisGridsEh;
 
 type
   TfmMain = class(TForm)
     alMain: TActionList;
     actConfig: TAction;
     cdsProjects: TSembaClientDataSet;
-    cdsSVNCommands: TSembaClientDataSet;
+    cdsSCMCommands: TSembaClientDataSet;
     dsProjectCommands: TDataSource;
-    cdsSVNCommandsCOMMAND_NAME: TSembaWideStringField;
-    cdsSVNCommandsCOMMAND_ARGUMENTS: TSembaWideStringField;
-    cdsSVNCommandsIS_FAVORITE: TSembaFloatField;
+    cdsSCMCommandsCOMMAND_NAME: TSembaWideStringField;
+    cdsSCMCommandsCOMMAND_ARGUMENTS: TSembaWideStringField;
+    cdsSCMCommandsIS_FAVORITE: TSembaFloatField;
     cdsProjectsPROJECT_NAME: TSembaWideStringField;
     cdsProjectsPROJECT_DIR: TSembaWideStringField;
     cdsProjectsIS_FAVORITE: TSembaFloatField;
     cdsProjectCommands: TSembaClientDataSet;
     cdsProjectsPROJECT_NO: TSembaFloatField;
-    cdsSVNCommandsCOMMAND_NO: TSembaFloatField;
+    cdsSCMCommandsCOMMAND_NO: TSembaFloatField;
     pnlMain: TPanel;
     grdProjectCommands: TSembaDBGrid;
     actShowMore: TAction;
@@ -32,7 +32,7 @@ type
     pnlShowMore: TPanel;
     btnShowMore: TSpeedButton;
     cdsProjects_MAX_NO: TAggregateField;
-    cdsSVNCommands_MAX_NO: TAggregateField;
+    cdsSCMCommands_MAX_NO: TAggregateField;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure grdProjectCommandsCellClick(Column: TColumnEh);
@@ -41,7 +41,7 @@ type
     procedure actConfigExecute(Sender: TObject);
     procedure grdProjectCommandsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure cdsProjectsNewRecord(DataSet: TDataSet);
-    procedure cdsSVNCommandsNewRecord(DataSet: TDataSet);
+    procedure cdsSCMCommandsNewRecord(DataSet: TDataSet);
     procedure grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumnEh;
       State: TGridDrawState);
   private
@@ -72,11 +72,11 @@ uses
   dwJumpLists, Registry, Math, fConfig, JclStrings, uUtils, StrUtils;
 
 const
-  RegKeySembaSVNProjects = 'Software\SEMBA\SembaSVNProjects';
+  RegKeySembaSCMProjects = 'Software\SEMBA\SembaSCMProjects';
 
   RegValueTortoiseSVNProcFileName = 'TortoiseSVNProcFileName';
   RegValueProjects = 'Projects';
-  RegValueSVNCommands = 'SVNCommands';
+  RegValueSCMCommands = 'SCMCommands';
 
   EnvVarProgramFiles = 'ProgramW6432';
   EnvVarProgramFilesX86 = 'ProgramFiles(x86)';
@@ -135,11 +135,11 @@ begin
   Reg:= TRegistry.Create;
   try
     Reg.RootKey:= HKEY_CURRENT_USER;
-    if Reg.OpenKey(RegKeySembaSVNProjects, False) then
+    if Reg.OpenKey(RegKeySembaSCMProjects, False) then
       try
         FTortoiseSVNProcFileName:= Reg.ReadString(RegValueTortoiseSVNProcFileName);
         LoadDataSet(cdsProjects, Reg, RegValueProjects);
-        LoadDataSet(cdsSVNCommands, Reg, RegValueSVNCommands);
+        LoadDataSet(cdsSCMCommands, Reg, RegValueSCMCommands);
       finally
         Reg.CloseKey;
       end;
@@ -150,11 +150,11 @@ begin
   if (FTortoiseSVNProcFileName = '') then
     FTortoiseSVNProcFileName:= GetDefaultTortoiseProcFileName;
 
-  if cdsSVNCommands.IsEmpty then
+  if cdsSCMCommands.IsEmpty then
     begin
-      cdsSVNCommands.AppendRecord([1, 'Changes', '/command:repostatus /path:%ProjectDir%', 1]);
-      cdsSVNCommands.AppendRecord([2, 'Update', '/command:update /path:%ProjectDir%', 1]);
-      cdsSVNCommands.AppendRecord([3, 'Log', '/command:log /path:%ProjectDir%', 0]);
+      cdsSCMCommands.AppendRecord([1, 'Changes', '/command:repostatus /path:%ProjectDir%', 1]);
+      cdsSCMCommands.AppendRecord([2, 'Update', '/command:update /path:%ProjectDir%', 1]);
+      cdsSCMCommands.AppendRecord([3, 'Log', '/command:log /path:%ProjectDir%', 0]);
     end;
 end;
 
@@ -179,10 +179,10 @@ begin
   Reg:= TRegistry.Create;
   try
     Reg.RootKey:= HKEY_CURRENT_USER;
-    Reg.OpenKey(RegKeySembaSVNProjects, True);
+    Reg.OpenKey(RegKeySembaSCMProjects, True);
     try
       Reg.WriteString(RegValueTortoiseSVNProcFileName, FTortoiseSVNProcFileName);
-      SaveDataSet(cdsSVNCommands, Reg, RegValueSVNCommands);
+      SaveDataSet(cdsSCMCommands, Reg, RegValueSCMCommands);
       SaveDataSet(cdsProjects, Reg, RegValueProjects);
     finally
       Reg.CloseKey;
@@ -212,11 +212,11 @@ begin
   AddFieldDef('PROJECT_DIR', ftWideString, 250);
   AddFieldDef('IS_FAVORITE', ftFloat);
 
-  cdsSVNCommands.First;
-  while not cdsSVNCommands.Eof do
+  cdsSCMCommands.First;
+  while not cdsSCMCommands.Eof do
     begin
-      AddFieldDef(CommandPrefix + cdsSVNCommandsCOMMAND_NO.AsString, ftWideString, 250);
-      cdsSVNCommands.Next;
+      AddFieldDef(CommandPrefix + cdsSCMCommandsCOMMAND_NO.AsString, ftWideString, 250);
+      cdsSCMCommands.Next;
     end;
 
   cdsProjectCommands.CreateDataSet;
@@ -230,11 +230,11 @@ begin
         cdsProjectCommands.FieldByName('PROJECT_DIR').Assign(cdsProjectsPROJECT_DIR);
         cdsProjectCommands.FieldByName('IS_FAVORITE').Assign(cdsProjectsIS_FAVORITE);
 
-        cdsSVNCommands.First;
-        while not cdsSVNCommands.Eof do
+        cdsSCMCommands.First;
+        while not cdsSCMCommands.Eof do
           begin
-            cdsProjectCommands.FieldByName(CommandPrefix + cdsSVNCommandsCOMMAND_NO.AsString).Assign(cdsSVNCommandsCOMMAND_NAME);
-            cdsSVNCommands.Next;
+            cdsProjectCommands.FieldByName(CommandPrefix + cdsSCMCommandsCOMMAND_NO.AsString).Assign(cdsSCMCommandsCOMMAND_NAME);
+            cdsSCMCommands.Next;
           end;
 
         cdsProjectCommands.Post;
@@ -272,11 +272,11 @@ begin
 
   AddColumn('PROJECT_NAME', ProjectNameColumnWidth, False);
 
-  cdsSVNCommands.First;
-  while not cdsSVNCommands.Eof do
+  cdsSCMCommands.First;
+  while not cdsSCMCommands.Eof do
     begin
-      AddColumn(CommandPrefix + cdsSVNCommandsCOMMAND_NO.AsString, CommandColumnWidth, True);
-      cdsSVNCommands.Next;
+      AddColumn(CommandPrefix + cdsSCMCommandsCOMMAND_NO.AsString, CommandColumnWidth, True);
+      cdsSCMCommands.Next;
     end;
 end;
 
@@ -287,7 +287,7 @@ begin
   RefreshGridColumns;
 
   cdsProjects.First;
-  cdsSVNCommands.First;
+  cdsSCMCommands.First;
 
   RecalcFormDimensionsAndPosition;
 end;
@@ -306,14 +306,14 @@ begin
   ClientWidth:=
     4 + // bevel
     ProjectNameColumnWidth +
-    cdsSVNCommands.RecordCount * CommandColumnWidth;
+    cdsSCMCommands.RecordCount * CommandColumnWidth;
 end;
 
 procedure TfmMain.SetFormPosition;
 
   function CalcLeft: Integer;
   begin
-    Result:= FSavedMousePos.X - ProjectNameColumnWidth - ((cdsSVNCommands.RecordCount * CommandColumnWidth) div 2);
+    Result:= FSavedMousePos.X - ProjectNameColumnWidth - ((cdsSCMCommands.RecordCount * CommandColumnWidth) div 2);
     Result:= Max(Result, 0);
     Result:= Min(Result, Screen.Width - Width);
   end;
@@ -330,7 +330,7 @@ end;
 procedure TfmMain.FormCreate(Sender: TObject);
 begin
   cdsProjects.CreateDataSet;
-  cdsSVNCommands.CreateDataSet;
+  cdsSCMCommands.CreateDataSet;
 
   LoadConfig;
 
@@ -369,21 +369,21 @@ begin
             Category:= JumpLists.Categories.Add;
             Category.Title:= cdsProjectsPROJECT_NAME.AsString;
 
-            cdsSVNCommands.First;
-            while not cdsSVNCommands.eof do
+            cdsSCMCommands.First;
+            while not cdsSCMCommands.eof do
               begin
-                if cdsSVNCommandsIS_FAVORITE.AsBoolean then
+                if cdsSCMCommandsIS_FAVORITE.AsBoolean then
                   begin
                     Task:= Category.Items.Add;
                     Task.ObjectType:= lotShellLink;
-                    Task.ShellLink.DisplayName:= cdsSVNCommandsCOMMAND_NAME.AsString;
+                    Task.ShellLink.DisplayName:= cdsSCMCommandsCOMMAND_NAME.AsString;
                     Task.ShellLink.Arguments:=
                       Format('%s "%s"', [
                         FTortoiseSVNProcFileName,
-                        StringReplace(cdsSVNCommandsCOMMAND_ARGUMENTS.AsString, ProjectPathMacro, cdsProjectsPROJECT_DIR.AsString, [rfReplaceAll])]);
+                        StringReplace(cdsSCMCommandsCOMMAND_ARGUMENTS.AsString, ProjectPathMacro, cdsProjectsPROJECT_DIR.AsString, [rfReplaceAll])]);
                   end;
 
-                cdsSVNCommands.Next
+                cdsSCMCommands.Next
               end;
           end;
 
@@ -405,12 +405,12 @@ begin
 
   Assert(StartsStr('CMD_', Column.FieldName));
 
-  if not cdsSVNCommands.Locate('COMMAND_NO', StrToInt(GetLastToken(Column.FieldName, '_')), []) then
+  if not cdsSCMCommands.Locate('COMMAND_NO', StrToInt(GetLastToken(Column.FieldName, '_')), []) then
     raise Exception.Create('Internal error: Command not found');
 
   Arguments:=
     StringReplace(
-      cdsSVNCommandsCOMMAND_ARGUMENTS.AsString,
+      cdsSCMCommandsCOMMAND_ARGUMENTS.AsString,
       ProjectPathMacro,
       cdsProjectCommands.FieldByName('PROJECT_DIR').AsString,
       [rfReplaceAll]);
@@ -446,16 +446,16 @@ procedure TfmMain.actConfigExecute(Sender: TObject);
 var
   fmConfig: TfmConfig;
   ProjectsSavePoint: Integer;
-  SVNCommandsSavePoint: Integer;
+  SCMCommandsSavePoint: Integer;
 begin
   fmConfig:= TfmConfig.Create(Self);
   try
     ProjectsSavePoint:= cdsProjects.SavePoint;
     try
-      SVNCommandsSavePoint:= cdsSVNCommands.SavePoint;
+      SCMCommandsSavePoint:= cdsSCMCommands.SavePoint;
       try
         fmConfig.dsProjects.DataSet:= cdsProjects;
-        fmConfig.dsSVNCommands.DataSet:= cdsSVNCommands;
+        fmConfig.dsSCMCommands.DataSet:= cdsSCMCommands;
         fmConfig.TortoiseSVNProcFileName:= FTortoiseSVNProcFileName;
 
         if (fmConfig.ShowModal <> mrOk) then
@@ -463,7 +463,7 @@ begin
 
         FTortoiseSVNProcFileName:= fmConfig.TortoiseSVNProcFileName;
       except
-        cdsSVNCommands.SavePoint:= SVNCommandsSavePoint;
+        cdsSCMCommands.SavePoint:= SCMCommandsSavePoint;
         raise;
       end;
     except
@@ -483,10 +483,10 @@ begin
   cdsProjectsIS_FAVORITE.AsBoolean:= True;
 end;
 
-procedure TfmMain.cdsSVNCommandsNewRecord(DataSet: TDataSet);
+procedure TfmMain.cdsSCMCommandsNewRecord(DataSet: TDataSet);
 begin
-  cdsSVNCommandsCOMMAND_NO.AsInteger:= VarToInt(cdsSVNCommands_MAX_NO.AsVariant) + 1;
-  cdsSVNCommandsIS_FAVORITE.AsBoolean:= True;
+  cdsSCMCommandsCOMMAND_NO.AsInteger:= VarToInt(cdsSCMCommands_MAX_NO.AsVariant) + 1;
+  cdsSCMCommandsIS_FAVORITE.AsBoolean:= True;
 end;
 
 procedure TfmMain.grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;

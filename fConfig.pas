@@ -5,14 +5,15 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, DB, StdCtrls, Buttons, ExtCtrls, GridsEh, DBGridEh, SembaDBGrid, DBCtrls,
-  ActnList, ColorNavigator, JvBaseDlg, JvSelectDirectory, ImgList, Mask, JvExMask, JvToolEdit, DBGridEhGrouping;
+  ActnList, ColorNavigator, JvBaseDlg, JvSelectDirectory, ImgList, Mask, JvExMask, JvToolEdit, DBGridEhGrouping,
+  System.Actions, DBAxisGridsEh;
 
 type
   TMoveDirection = (mdUp, mdDown);
 
 type
   TfmConfig = class(TForm)
-    dsSVNCommands: TDataSource;
+    dsSCMCommands: TDataSource;
     dsProjects: TDataSource;
     pnlOkCancelButtons: TPanel;
     btnCancel: TBitBtn;
@@ -21,12 +22,12 @@ type
     fneTortoiseSVNProcFileName: TJvFilenameEdit;
     gbProjects: TGroupBox;
     grdProjects: TSembaDBGrid;
-    gbSVNCommands: TGroupBox;
-    grdSVNCommands: TSembaDBGrid;
+    gbSCMCommands: TGroupBox;
+    grdSCMCommands: TSembaDBGrid;
     alMain: TActionList;
     actAddProject: TAction;
     navProjects: TDBColorNavigator;
-    navSVNCommands: TDBColorNavigator;
+    navSCMCommands: TDBColorNavigator;
     sdProjectDir: TJvSelectDirectory;
     actMoveProjectUp: TAction;
     actMoveProjectDown: TAction;
@@ -111,18 +112,18 @@ begin
         end;
 
       dsProjects.DataSet.CheckBrowseMode;
-      dsSVNCommands.DataSet.CheckBrowseMode;
+      dsSCMCommands.DataSet.CheckBrowseMode;
     end;
 end;
 
 procedure TfmConfig.actMoveCommandDownExecute(Sender: TObject);
 begin
-  MoveRecord(dsSVNCommands.DataSet, 'COMMAND_NO', mdDown);
+  MoveRecord(dsSCMCommands.DataSet, 'COMMAND_NO', mdDown);
 end;
 
 procedure TfmConfig.actMoveCommandUpExecute(Sender: TObject);
 begin
-  MoveRecord(dsSVNCommands.DataSet, 'COMMAND_NO', mdUp);
+  MoveRecord(dsSCMCommands.DataSet, 'COMMAND_NO', mdUp);
 end;
 
 procedure TfmConfig.actMoveProjectDownExecute(Sender: TObject);
