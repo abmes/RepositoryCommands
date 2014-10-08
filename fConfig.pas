@@ -5,28 +5,31 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, DB, StdCtrls, Buttons, ExtCtrls, GridsEh, DBGridEh, SembaDBGrid, DBCtrls,
-  ActnList, ColorNavigator, JvBaseDlg, JvSelectDirectory, ImgList, Mask, JvExMask, JvToolEdit, DBGridEhGrouping;
+  ActnList, ColorNavigator, JvBaseDlg, JvSelectDirectory, ImgList, Mask, JvExMask, JvToolEdit, DBGridEhGrouping,
+  System.Actions, DBAxisGridsEh;
 
 type
   TMoveDirection = (mdUp, mdDown);
 
 type
   TfmConfig = class(TForm)
-    dsSVNCommands: TDataSource;
+    dsSCMCommands: TDataSource;
     dsProjects: TDataSource;
     pnlOkCancelButtons: TPanel;
     btnCancel: TBitBtn;
     btnOk: TBitBtn;
     gbTortoiseSVNProcFileName: TGroupBox;
     fneTortoiseSVNProcFileName: TJvFilenameEdit;
+    gbTortoiseGitProcFileName: TGroupBox;
+    fneTortoiseGitProcFileName: TJvFilenameEdit;
     gbProjects: TGroupBox;
     grdProjects: TSembaDBGrid;
-    gbSVNCommands: TGroupBox;
-    grdSVNCommands: TSembaDBGrid;
+    gbSCMCommands: TGroupBox;
+    grdSCMCommands: TSembaDBGrid;
     alMain: TActionList;
     actAddProject: TAction;
     navProjects: TDBColorNavigator;
-    navSVNCommands: TDBColorNavigator;
+    navSCMCommands: TDBColorNavigator;
     sdProjectDir: TJvSelectDirectory;
     actMoveProjectUp: TAction;
     actMoveProjectDown: TAction;
@@ -48,19 +51,20 @@ type
   private
     function GetTortoiseSVNProcFileName: string;
     procedure SetTortoiseSVNProcFileName(const Value: string);
+    function GetTortoiseGitProcFileName: string;
+    procedure SetTortoiseGitProcFileName(const Value: string);
     procedure MoveRecord(ADataSet: TDataSet; const ANoFieldName: string; AMoveDirection: TMoveDirection);
     function GetProjectName(const APath: string): string;
+    function GetProjectType(const APath: string): string;
   public
     property TortoiseSVNProcFileName: string read GetTortoiseSVNProcFileName write SetTortoiseSVNProcFileName;
+    property TortoiseGitProcFileName: string read GetTortoiseGitProcFileName write SetTortoiseGitProcFileName;
   end;
 
 implementation
 
 uses
   IOUtils, DBConsts, uUtils, Types;
-
-const
-  SVNSubDir = '.svn';
 
 {$R *.dfm}
 
@@ -71,17 +75,26 @@ begin
   Result:= GetLastToken(ExcludeTrailingPathDelimiter(APath), PathDelim);
 end;
 
+function TfmConfig.GetProjectType(const APath: string): string;
+begin
+  if (Length(TDirectory.GetDirectories(sdProjectDir.Directory, SVNSubDir)) = 1) then
+    Exit(SVNSubDir);
+
+  if (Length(TDirectory.GetDirectories(sdProjectDir.Directory, GitSubDir)) = 1) then
+    Exit(GitSubDir);
+
+  raise Exception.Create('Unknown SCM type!');
+end;
+
 procedure TfmConfig.actAddProjectExecute(Sender: TObject);
 begin
   if sdProjectDir.Execute then
     begin
-      if (Length(TDirectory.GetDirectories(sdProjectDir.Directory, SVNSubDir)) = 0) then
-        raise Exception.Create('This is not an svn monitored directory!');
-
       dsProjects.DataSet.Append;
       try
         dsProjects.DataSet.FieldByName('PROJECT_DIR').AsString:= sdProjectDir.Directory;
         dsProjects.DataSet.FieldByName('PROJECT_NAME').AsString:= GetProjectName(sdProjectDir.Directory);
+        dsProjects.DataSet.FieldByName('PROJECT_TYPE').AsString:= GetProjectType(sdProjectDir.Directory);
         dsProjects.DataSet.Post;
       except
         dsProjects.DataSet.Cancel;
@@ -100,29 +113,46 @@ begin
   fneTortoiseSVNProcFileName.Text:= Value;
 end;
 
+function TfmConfig.GetTortoiseGitProcFileName: string;
+begin
+  Result:= fneTortoiseGitProcFileName.Text;
+end;
+
+procedure TfmConfig.SetTortoiseGitProcFileName(const Value: string);
+begin
+  fneTortoiseGitProcFileName.Text:= Value;
+end;
+
 procedure TfmConfig.FormClose(Sender: TObject; var Action: TCloseAction);
+
+  procedure CheckRequiredFileName(AFileNameEdit: TJvFileNameEdit; const AFieldName: string);
+  begin
+    if (AFileNameEdit.Text = '') then
+      begin
+        ActiveControl:= AFileNameEdit;
+        raise Exception.CreateFmt(SFieldRequired, [AFieldName]);
+      end;
+  end;
+
 begin
   if (ModalResult = mrOk) then
     begin
-      if (fneTortoiseSVNProcFileName.Text = '') then
-        begin
-          ActiveControl:= fneTortoiseSVNProcFileName;
-          raise Exception.CreateFmt(SFieldRequired, ['TortoiseSVNProc']);
-        end;
+      CheckRequiredFileName(fneTortoiseSVNProcFileName, 'TortoiseSVNProc');
+      CheckRequiredFileName(fneTortoiseGitProcFileName, 'TortoiseGitProc');
 
       dsProjects.DataSet.CheckBrowseMode;
-      dsSVNCommands.DataSet.CheckBrowseMode;
+      dsSCMCommands.DataSet.CheckBrowseMode;
     end;
 end;
 
 procedure TfmConfig.actMoveCommandDownExecute(Sender: TObject);
 begin
-  MoveRecord(dsSVNCommands.DataSet, 'COMMAND_NO', mdDown);
+  MoveRecord(dsSCMCommands.DataSet, 'COMMAND_NO', mdDown);
 end;
 
 procedure TfmConfig.actMoveCommandUpExecute(Sender: TObject);
 begin
-  MoveRecord(dsSVNCommands.DataSet, 'COMMAND_NO', mdUp);
+  MoveRecord(dsSCMCommands.DataSet, 'COMMAND_NO', mdUp);
 end;
 
 procedure TfmConfig.actMoveProjectDownExecute(Sender: TObject);

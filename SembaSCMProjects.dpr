@@ -1,4 +1,4 @@
-program SembaSVNProjects;
+program SembaSCMProjects;
 
 uses
   MidasLib,

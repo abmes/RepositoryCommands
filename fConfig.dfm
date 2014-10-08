@@ -4,8 +4,8 @@ object fmConfig: TfmConfig
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Configuration'
-  ClientHeight = 533
-  ClientWidth = 546
+  ClientHeight = 597
+  ClientWidth = 746
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,17 +19,17 @@ object fmConfig: TfmConfig
   TextHeight = 13
   object pnlOkCancelButtons: TPanel
     Left = 0
-    Top = 497
-    Width = 546
+    Top = 561
+    Width = 746
     Height = 36
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      546
+      746
       36)
     object btnCancel: TBitBtn
-      Left = 456
+      Left = 656
       Top = 4
       Width = 83
       Height = 25
@@ -39,7 +39,7 @@ object fmConfig: TfmConfig
       TabOrder = 0
     end
     object btnOk: TBitBtn
-      Left = 368
+      Left = 568
       Top = 4
       Width = 83
       Height = 25
@@ -52,41 +52,42 @@ object fmConfig: TfmConfig
   object gbTortoiseSVNProcFileName: TGroupBox
     Left = 8
     Top = 8
-    Width = 529
+    Width = 729
     Height = 57
     Caption = ' TortoiseSVNProc Executable '
     TabOrder = 1
     DesignSize = (
-      529
+      729
       57)
     object fneTortoiseSVNProcFileName: TJvFilenameEdit
       Left = 16
       Top = 24
-      Width = 497
+      Width = 697
       Height = 21
       Filter = 'Executable|*.exe'
       DialogOptions = [ofHideReadOnly, ofFileMustExist]
       DirectInput = False
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
+      Text = ''
     end
   end
   object gbProjects: TGroupBox
     Left = 8
-    Top = 72
-    Width = 529
+    Top = 136
+    Width = 729
     Height = 233
     Caption = ' Projects '
     TabOrder = 2
     object btnMoveProjectUp: TSpeedButton
-      Left = 500
+      Left = 700
       Top = 103
       Width = 25
       Height = 25
       Action = actMoveProjectUp
     end
     object btnMoveProjectDown: TSpeedButton
-      Left = 500
+      Left = 700
       Top = 127
       Width = 25
       Height = 25
@@ -95,29 +96,19 @@ object fmConfig: TfmConfig
     object grdProjects: TSembaDBGrid
       Left = 16
       Top = 48
-      Width = 481
+      Width = 681
       Height = 171
-      DataGrouping.GroupLevels = <>
       DataSource = dsProjects
-      Flat = False
-      FooterColor = clWindow
-      FooterFont.Charset = DEFAULT_CHARSET
-      FooterFont.Color = clWindowText
-      FooterFont.Height = -11
-      FooterFont.Name = 'Tahoma'
-      FooterFont.Style = []
+      DynProps = <>
+      FooterParams.Color = clWindow
       IndicatorOptions = [gioShowRowIndicatorEh]
       Options = [dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
       OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghExtendVertLines]
       TabOrder = 0
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      UseMultiTitle = True
+      TitleParams.MultiTitle = True
       Columns = <
         item
+          DynProps = <>
           EditButtons = <>
           FieldName = 'PROJECT_NAME'
           Footers = <>
@@ -125,14 +116,25 @@ object fmConfig: TfmConfig
           Width = 146
         end
         item
+          Alignment = taCenter
+          DynProps = <>
+          EditButtons = <>
+          FieldName = 'PROJECT_TYPE'
+          Footers = <>
+          Title.Caption = 'Project Type'
+          Width = 80
+        end
+        item
+          DynProps = <>
           EditButtons = <>
           FieldName = 'PROJECT_DIR'
           Footers = <>
           Title.Caption = 'Project Dir'
-          Width = 249
+          Width = 368
         end
         item
           Checkboxes = True
+          DynProps = <>
           EditButtons = <>
           FieldName = 'IS_FAVORITE'
           Footers = <>
@@ -149,65 +151,54 @@ object fmConfig: TfmConfig
       Height = 25
       DataSource = dsProjects
       VisibleButtons = [nbInsert, nbDelete]
-      Kind = dbnHorizontal
       TabOrder = 1
       BeforeAction = navProjectsBeforeAction
     end
   end
-  object gbSVNCommands: TGroupBox
+  object gbSCMCommands: TGroupBox
     Left = 8
-    Top = 312
-    Width = 529
+    Top = 376
+    Width = 729
     Height = 177
-    Caption = ' SVN Commands '
+    Caption = ' SCM Commands '
     TabOrder = 3
     object btnMoveCommandDown: TSpeedButton
-      Left = 500
+      Left = 700
       Top = 111
       Width = 25
       Height = 25
       Action = actMoveCommandDown
     end
     object btnMoveCommandUp: TSpeedButton
-      Left = 500
+      Left = 700
       Top = 87
       Width = 25
       Height = 25
       Action = actMoveCommandUp
     end
     object lblMacroHint: TLabel
-      Left = 352
+      Left = 552
       Top = 32
       Width = 146
       Height = 13
       Caption = 'Possible Macro: %ProjectDir%'
     end
-    object grdSVNCommands: TSembaDBGrid
+    object grdSCMCommands: TSembaDBGrid
       Left = 16
       Top = 48
-      Width = 481
+      Width = 681
       Height = 117
-      DataGrouping.GroupLevels = <>
-      DataSource = dsSVNCommands
-      Flat = False
-      FooterColor = clWindow
-      FooterFont.Charset = DEFAULT_CHARSET
-      FooterFont.Color = clWindowText
-      FooterFont.Height = -11
-      FooterFont.Name = 'Tahoma'
-      FooterFont.Style = []
+      DataSource = dsSCMCommands
+      DynProps = <>
+      FooterParams.Color = clWindow
       IndicatorOptions = [gioShowRowIndicatorEh]
       Options = [dgEditing, dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
       OptionsEh = [dghFixed3D, dghHighlightFocus, dghClearSelection, dghDialogFind, dghExtendVertLines]
       TabOrder = 0
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      UseMultiTitle = True
+      TitleParams.MultiTitle = True
       Columns = <
         item
+          DynProps = <>
           EditButtons = <>
           FieldName = 'COMMAND_NAME'
           Footers = <>
@@ -215,14 +206,16 @@ object fmConfig: TfmConfig
           Width = 146
         end
         item
+          DynProps = <>
           EditButtons = <>
           FieldName = 'COMMAND_ARGUMENTS'
           Footers = <>
           Title.Caption = 'Arguments'
-          Width = 249
+          Width = 448
         end
         item
           Checkboxes = True
+          DynProps = <>
           EditButtons = <>
           FieldName = 'IS_FAVORITE'
           Footers = <>
@@ -232,18 +225,40 @@ object fmConfig: TfmConfig
       object RowDetailData: TRowDetailPanelControlEh
       end
     end
-    object navSVNCommands: TDBColorNavigator
+    object navSCMCommands: TDBColorNavigator
       Left = 16
       Top = 22
       Width = 56
       Height = 25
-      DataSource = dsSVNCommands
+      DataSource = dsSCMCommands
       VisibleButtons = [nbInsert, nbDelete]
-      Kind = dbnHorizontal
       TabOrder = 1
     end
   end
-  object dsSVNCommands: TDataSource
+  object gbTortoiseGitProcFileName: TGroupBox
+    Left = 8
+    Top = 72
+    Width = 729
+    Height = 57
+    Caption = ' TortoiseGitProc Executable '
+    TabOrder = 4
+    DesignSize = (
+      729
+      57)
+    object fneTortoiseGitProcFileName: TJvFilenameEdit
+      Left = 16
+      Top = 24
+      Width = 697
+      Height = 21
+      Filter = 'Executable|*.exe'
+      DialogOptions = [ofHideReadOnly, ofFileMustExist]
+      DirectInput = False
+      Anchors = [akLeft, akTop, akRight]
+      TabOrder = 0
+      Text = ''
+    end
+  end
+  object dsSCMCommands: TDataSource
     Left = 240
   end
   object dsProjects: TDataSource
@@ -286,7 +301,7 @@ object fmConfig: TfmConfig
   object ilActions: TImageList
     Left = 320
     Bitmap = {
-      494C010102000800200010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000500040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

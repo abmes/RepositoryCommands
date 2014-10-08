@@ -34,17 +34,11 @@ object fmMain: TfmMain
       Height = 126
       Align = alClient
       BorderStyle = bsNone
-      DataGrouping.GroupLevels = <>
       DataSource = dsProjectCommands
       DefaultDrawing = False
+      DynProps = <>
       EvenRowColor = 15137255
-      Flat = False
-      FooterColor = clWindow
-      FooterFont.Charset = DEFAULT_CHARSET
-      FooterFont.Color = clWindowText
-      FooterFont.Height = -11
-      FooterFont.Name = 'Tahoma'
-      FooterFont.Style = []
+      FooterParams.Color = clWindow
       HorzScrollBar.Visible = False
       IndicatorOptions = []
       OddRowColor = clCream
@@ -52,11 +46,6 @@ object fmMain: TfmMain
       OptionsEh = [dghFixed3D, dghClearSelection, dghDialogFind, dghExtendVertLines]
       RowHeight = 18
       TabOrder = 0
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
       VertScrollBar.VisibleMode = sbNeverShowEh
       OnCellClick = grdProjectCommandsCellClick
       OnDrawColumnCell = grdProjectCommandsDrawColumnCell
@@ -151,13 +140,20 @@ object fmMain: TfmMain
       Required = True
       FieldValueType = fvtBoolean
     end
+    object cdsProjectsPROJECT_TYPE: TSembaWideStringField
+      DisplayLabel = 'Project Type'
+      FieldName = 'PROJECT_TYPE'
+      Required = True
+      Size = 50
+    end
     object cdsProjects_MAX_NO: TAggregateField
       FieldName = '_MAX_NO'
       Active = True
+      DisplayName = ''
       Expression = 'Max(PROJECT_NO)'
     end
   end
-  object cdsSVNCommands: TSembaClientDataSet
+  object cdsSCMCommands: TSembaClientDataSet
     Aggregates = <>
     AggregatesActive = True
     FieldDefs = <>
@@ -165,34 +161,35 @@ object fmMain: TfmMain
     IndexFieldNames = 'COMMAND_NO'
     Params = <>
     StoreDefs = True
-    OnNewRecord = cdsSVNCommandsNewRecord
+    OnNewRecord = cdsSCMCommandsNewRecord
     Left = 272
-    object cdsSVNCommandsCOMMAND_NO: TSembaFloatField
+    object cdsSCMCommandsCOMMAND_NO: TSembaFloatField
       DisplayLabel = 'No'
       FieldName = 'COMMAND_NO'
       Required = True
     end
-    object cdsSVNCommandsCOMMAND_NAME: TSembaWideStringField
+    object cdsSCMCommandsCOMMAND_NAME: TSembaWideStringField
       DisplayLabel = 'Command Name'
       FieldName = 'COMMAND_NAME'
       Required = True
       Size = 50
     end
-    object cdsSVNCommandsCOMMAND_ARGUMENTS: TSembaWideStringField
+    object cdsSCMCommandsCOMMAND_ARGUMENTS: TSembaWideStringField
       DisplayLabel = 'Arguments'
       FieldName = 'COMMAND_ARGUMENTS'
       Required = True
       Size = 250
     end
-    object cdsSVNCommandsIS_FAVORITE: TSembaFloatField
+    object cdsSCMCommandsIS_FAVORITE: TSembaFloatField
       DisplayLabel = 'Favorite'
       FieldName = 'IS_FAVORITE'
       Required = True
       FieldValueType = fvtBoolean
     end
-    object cdsSVNCommands_MAX_NO: TAggregateField
+    object cdsSCMCommands_MAX_NO: TAggregateField
       FieldName = '_MAX_NO'
       Active = True
+      DisplayName = ''
       Expression = 'Max(COMMAND_NO)'
     end
   end

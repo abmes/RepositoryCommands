@@ -9,6 +9,10 @@ function VarToInt(const AValue: Variant): Integer;
 function GetTaskBarHeight: Integer;
 function IsTaskBarAtBottom: Boolean;
 
+const
+  SVNSubDir = '.svn';
+  GitSubDir = '.git';
+
 implementation
 
 uses
