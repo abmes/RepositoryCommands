@@ -4,7 +4,7 @@ object fmConfig: TfmConfig
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Configuration'
-  ClientHeight = 597
+  ClientHeight = 550
   ClientWidth = 746
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,7 +19,7 @@ object fmConfig: TfmConfig
   TextHeight = 13
   object pnlOkCancelButtons: TPanel
     Left = 0
-    Top = 561
+    Top = 514
     Width = 746
     Height = 36
     Align = alBottom
@@ -49,17 +49,17 @@ object fmConfig: TfmConfig
       TabOrder = 1
     end
   end
-  object gbTortoiseSVNProcFileName: TGroupBox
+  object gbTortoiseProcFileName: TGroupBox
     Left = 8
     Top = 8
     Width = 729
     Height = 57
-    Caption = ' TortoiseSVNProc Executable '
+    Caption = ' TortoiseProc Executable '
     TabOrder = 1
     DesignSize = (
       729
       57)
-    object fneTortoiseSVNProcFileName: TJvFilenameEdit
+    object fneTortoiseProcFileName: TJvFilenameEdit
       Left = 16
       Top = 24
       Width = 697
@@ -74,7 +74,7 @@ object fmConfig: TfmConfig
   end
   object gbProjects: TGroupBox
     Left = 8
-    Top = 136
+    Top = 80
     Width = 729
     Height = 233
     Caption = ' Projects '
@@ -113,16 +113,7 @@ object fmConfig: TfmConfig
           FieldName = 'PROJECT_NAME'
           Footers = <>
           Title.Caption = 'Project Name'
-          Width = 146
-        end
-        item
-          Alignment = taCenter
-          DynProps = <>
-          EditButtons = <>
-          FieldName = 'PROJECT_TYPE'
-          Footers = <>
-          Title.Caption = 'Project Type'
-          Width = 80
+          Width = 186
         end
         item
           DynProps = <>
@@ -130,7 +121,7 @@ object fmConfig: TfmConfig
           FieldName = 'PROJECT_DIR'
           Footers = <>
           Title.Caption = 'Project Dir'
-          Width = 368
+          Width = 408
         end
         item
           Checkboxes = True
@@ -157,7 +148,7 @@ object fmConfig: TfmConfig
   end
   object gbCommands: TGroupBox
     Left = 8
-    Top = 376
+    Top = 328
     Width = 729
     Height = 177
     Caption = ' Commands '
@@ -233,29 +224,6 @@ object fmConfig: TfmConfig
       DataSource = dsCommands
       VisibleButtons = [nbInsert, nbDelete]
       TabOrder = 1
-    end
-  end
-  object gbTortoiseGitProcFileName: TGroupBox
-    Left = 8
-    Top = 72
-    Width = 729
-    Height = 57
-    Caption = ' TortoiseGitProc Executable '
-    TabOrder = 4
-    DesignSize = (
-      729
-      57)
-    object fneTortoiseGitProcFileName: TJvFilenameEdit
-      Left = 16
-      Top = 24
-      Width = 697
-      Height = 21
-      Filter = 'Executable|*.exe'
-      DialogOptions = [ofHideReadOnly, ofFileMustExist]
-      DirectInput = False
-      Anchors = [akLeft, akTop, akRight]
-      TabOrder = 0
-      Text = ''
     end
   end
   object dsCommands: TDataSource

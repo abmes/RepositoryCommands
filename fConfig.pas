@@ -18,10 +18,8 @@ type
     pnlOkCancelButtons: TPanel;
     btnCancel: TBitBtn;
     btnOk: TBitBtn;
-    gbTortoiseSVNProcFileName: TGroupBox;
-    fneTortoiseSVNProcFileName: TJvFilenameEdit;
-    gbTortoiseGitProcFileName: TGroupBox;
-    fneTortoiseGitProcFileName: TJvFilenameEdit;
+    gbTortoiseProcFileName: TGroupBox;
+    fneTortoiseProcFileName: TJvFilenameEdit;
     gbProjects: TGroupBox;
     grdProjects: TSembaDBGrid;
     gbCommands: TGroupBox;
@@ -49,16 +47,13 @@ type
     procedure actMoveCommandDownExecute(Sender: TObject);
     procedure navProjectsBeforeAction(Sender: TObject; Button: TNavigateBtn);
   private
-    function GetTortoiseSVNProcFileName: string;
-    procedure SetTortoiseSVNProcFileName(const Value: string);
-    function GetTortoiseGitProcFileName: string;
-    procedure SetTortoiseGitProcFileName(const Value: string);
+    function GetTortoiseProcFileName: string;
+    procedure SetTortoiseProcFileName(const Value: string);
     procedure MoveRecord(ADataSet: TDataSet; const ANoFieldName: string; AMoveDirection: TMoveDirection);
     function GetProjectName(const APath: string): string;
-    function GetProjectType(const APath: string): string;
+    procedure CheckProjectType(const APath: string);
   public
-    property TortoiseSVNProcFileName: string read GetTortoiseSVNProcFileName write SetTortoiseSVNProcFileName;
-    property TortoiseGitProcFileName: string read GetTortoiseGitProcFileName write SetTortoiseGitProcFileName;
+    property TortoiseProcFileName: string read GetTortoiseProcFileName write SetTortoiseProcFileName;
   end;
 
 implementation
@@ -75,15 +70,10 @@ begin
   Result:= GetLastToken(ExcludeTrailingPathDelimiter(APath), PathDelim);
 end;
 
-function TfmConfig.GetProjectType(const APath: string): string;
+procedure TfmConfig.CheckProjectType(const APath: string);
 begin
-  if (Length(TDirectory.GetDirectories(sdProjectDir.Directory, SVNSubDir)) = 1) then
-    Exit(SVNSubDir);
-
-  if (Length(TDirectory.GetDirectories(sdProjectDir.Directory, GitSubDir)) = 1) then
-    Exit(GitSubDir);
-
-  raise Exception.Create('Unknown Repository type!');
+  if (Length(TDirectory.GetDirectories(APath, RepositoryTypeSubDirName)) = 0) then
+    raise Exception.Create('Unknown Repository type!');
 end;
 
 procedure TfmConfig.actAddProjectExecute(Sender: TObject);
@@ -92,9 +82,9 @@ begin
     begin
       dsProjects.DataSet.Append;
       try
+        CheckProjectType(sdProjectDir.Directory);
         dsProjects.DataSet.FieldByName('PROJECT_DIR').AsString:= sdProjectDir.Directory;
         dsProjects.DataSet.FieldByName('PROJECT_NAME').AsString:= GetProjectName(sdProjectDir.Directory);
-        dsProjects.DataSet.FieldByName('PROJECT_TYPE').AsString:= GetProjectType(sdProjectDir.Directory);
         dsProjects.DataSet.Post;
       except
         dsProjects.DataSet.Cancel;
@@ -103,24 +93,14 @@ begin
     end;
 end;
 
-function TfmConfig.GetTortoiseSVNProcFileName: string;
+function TfmConfig.GetTortoiseProcFileName: string;
 begin
-  Result:= fneTortoiseSVNProcFileName.Text;
+  Result:= fneTortoiseProcFileName.Text;
 end;
 
-procedure TfmConfig.SetTortoiseSVNProcFileName(const Value: string);
+procedure TfmConfig.SetTortoiseProcFileName(const Value: string);
 begin
-  fneTortoiseSVNProcFileName.Text:= Value;
-end;
-
-function TfmConfig.GetTortoiseGitProcFileName: string;
-begin
-  Result:= fneTortoiseGitProcFileName.Text;
-end;
-
-procedure TfmConfig.SetTortoiseGitProcFileName(const Value: string);
-begin
-  fneTortoiseGitProcFileName.Text:= Value;
+  fneTortoiseProcFileName.Text:= Value;
 end;
 
 procedure TfmConfig.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -137,9 +117,7 @@ procedure TfmConfig.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if (ModalResult = mrOk) then
     begin
-      CheckRequiredFileName(fneTortoiseSVNProcFileName, 'TortoiseSVNProc');
-      CheckRequiredFileName(fneTortoiseGitProcFileName, 'TortoiseGitProc');
-
+      CheckRequiredFileName(fneTortoiseProcFileName, 'TortoiseProc');
       dsProjects.DataSet.CheckBrowseMode;
       dsCommands.DataSet.CheckBrowseMode;
     end;

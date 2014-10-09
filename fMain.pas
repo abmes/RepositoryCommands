@@ -33,7 +33,6 @@ type
     btnShowMore: TSpeedButton;
     cdsProjects_MAX_NO: TAggregateField;
     cdsCommands_MAX_NO: TAggregateField;
-    cdsProjectsPROJECT_TYPE: TSembaWideStringField;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure grdProjectCommandsCellClick(Column: TColumnEh);
@@ -46,8 +45,7 @@ type
     procedure grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumnEh;
       State: TGridDrawState);
   private
-    FTortoiseSVNProcFileName: string;
-    FTortoiseGitProcFileName: string;
+    FTortoiseProcFileName: string;
     FIsNearMousePosition: Boolean;
     FSavedMousePos: TPoint;
     procedure CommitTasks;
@@ -61,7 +59,7 @@ type
     procedure SetFormWidth;
     function GetDefaultTortoiseProcFileName(const ATortoiseProcFileName: string): string;
     procedure RecalcFormDimensionsAndPosition;
-    function GetTortoiseProcFileName(const AProjectType: string): string;
+    function ConfigurationRegKey: string;
   public
     { Public declarations }
   end;
@@ -75,17 +73,12 @@ uses
   dwJumpLists, Registry, Math, fConfig, JclStrings, uUtils, StrUtils;
 
 const
-  RegKeySembaRepositories = 'Software\SEMBA\SembaRepositories';
-
-  RegValueTortoiseSVNProcFileName = 'TortoiseSVNProcFileName';
-  RegValueTortoiseGitProcFileName = 'TortoiseGitProcFileName';
+  RegValueTortoiseProcFileName = 'TortoiseProcFileName';
   RegValueProjects = 'Projects';
   RegValueCommands = 'Commands';
 
   EnvVarProgramFiles = 'ProgramW6432';
   EnvVarProgramFilesX86 = 'ProgramFiles(x86)';
-  DefaultTortoiseSVNProcFileName = '\TortoiseSVN\bin\TortoiseProc.exe';
-  DefaultTortoiseGitProcFileName = '\TortoiseGit\bin\TortoiseGitProc.exe';
   CommandPrefix = 'CMD_';
   ProjectPathMacro = '%ProjectDir%';
   ProjectsGridRowHeight = 25;
@@ -94,6 +87,13 @@ const
   NearMousePositionTolerancePixelCount = 30;
 
 {$R *.dfm}
+
+function TfmMain.ConfigurationRegKey: string;
+const
+  RegKeySembaRepositories = 'Software\SEMBA\SembaRepositories';
+begin
+  Result:= RegKeySembaRepositories + '\' + RepositoryTypeName;
+end;
 
 function TfmMain.GetDefaultTortoiseProcFileName(const ATortoiseProcFileName: string): string;
 
@@ -140,10 +140,9 @@ begin
   Reg:= TRegistry.Create;
   try
     Reg.RootKey:= HKEY_CURRENT_USER;
-    if Reg.OpenKey(RegKeySembaRepositories, False) then
+    if Reg.OpenKey(ConfigurationRegKey, False) then
       try
-        FTortoiseSVNProcFileName:= Reg.ReadString(RegValueTortoiseSVNProcFileName);
-        FTortoiseGitProcFileName:= Reg.ReadString(RegValueTortoiseGitProcFileName);
+        FTortoiseProcFileName:= Reg.ReadString(RegValueTortoiseProcFileName);
         LoadDataSet(cdsProjects, Reg, RegValueProjects);
         LoadDataSet(cdsCommands, Reg, RegValueCommands);
       finally
@@ -153,18 +152,8 @@ begin
     FreeAndNil(Reg);
   end;
 
-  if (FTortoiseSVNProcFileName = '') then
-    FTortoiseSVNProcFileName:= GetDefaultTortoiseProcFileName(DefaultTortoiseSVNProcFileName);
-
-  if (FTortoiseGitProcFileName = '') then
-    FTortoiseGitProcFileName:= GetDefaultTortoiseProcFileName(DefaultTortoiseGitProcFileName);
-
-  if cdsCommands.IsEmpty then
-    begin
-      cdsCommands.AppendRecord([1, 'Changes', '/command:repostatus /path:%ProjectDir%', 1]);
-      cdsCommands.AppendRecord([2, 'Update', '/command:update /path:%ProjectDir%', 1]);
-      cdsCommands.AppendRecord([3, 'Log', '/command:log /path:%ProjectDir%', 0]);
-    end;
+  if (FTortoiseProcFileName = '') then
+    FTortoiseProcFileName:= GetDefaultTortoiseProcFileName(DefaultTortoiseProcFileName);
 end;
 
 procedure TfmMain.SaveConfig;
@@ -188,10 +177,9 @@ begin
   Reg:= TRegistry.Create;
   try
     Reg.RootKey:= HKEY_CURRENT_USER;
-    Reg.OpenKey(RegKeySembaRepositories, True);
+    Reg.OpenKey(ConfigurationRegKey, True);
     try
-      Reg.WriteString(RegValueTortoiseSVNProcFileName, FTortoiseSVNProcFileName);
-      Reg.WriteString(RegValueTortoiseGitProcFileName, FTortoiseGitProcFileName);
+      Reg.WriteString(RegValueTortoiseProcFileName, FTortoiseProcFileName);
       SaveDataSet(cdsCommands, Reg, RegValueCommands);
       SaveDataSet(cdsProjects, Reg, RegValueProjects);
     finally
@@ -220,7 +208,6 @@ begin
 
   AddFieldDef('PROJECT_NAME', ftWideString, 50);
   AddFieldDef('PROJECT_DIR', ftWideString, 250);
-  AddFieldDef('PROJECT_TYPE', ftWideString, 50);
   AddFieldDef('IS_FAVORITE', ftFloat);
 
   cdsCommands.First;
@@ -239,7 +226,6 @@ begin
       try
         cdsProjectCommands.FieldByName('PROJECT_NAME').Assign(cdsProjectsPROJECT_NAME);
         cdsProjectCommands.FieldByName('PROJECT_DIR').Assign(cdsProjectsPROJECT_DIR);
-        cdsProjectCommands.FieldByName('PROJECT_TYPE').Assign(cdsProjectsPROJECT_TYPE);
         cdsProjectCommands.FieldByName('IS_FAVORITE').Assign(cdsProjectsIS_FAVORITE);
 
         cdsCommands.First;
@@ -391,7 +377,7 @@ begin
                     Task.ShellLink.DisplayName:= cdsCommandsCOMMAND_NAME.AsString;
                     Task.ShellLink.Arguments:=
                       Format('%s "%s"', [
-                        GetTortoiseProcFileName(cdsProjectsPROJECT_TYPE.AsString),
+                        FTortoiseProcFileName,
                         StringReplace(cdsCommandsCOMMAND_ARGUMENTS.AsString, ProjectPathMacro, cdsProjectsPROJECT_DIR.AsString, [rfReplaceAll])]);
                   end;
 
@@ -427,7 +413,7 @@ begin
       cdsProjectCommands.FieldByName('PROJECT_DIR').AsString,
       [rfReplaceAll]);
 
-  ExecCommandAndHalt(GetTortoiseProcFileName(cdsProjectCommands.FieldByName('PROJECT_TYPE').AsString), Arguments);
+  ExecCommandAndHalt(FTortoiseProcFileName, Arguments);
 end;
 
 procedure TfmMain.grdProjectCommandsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -466,14 +452,12 @@ begin
       try
         fmConfig.dsProjects.DataSet:= cdsProjects;
         fmConfig.dsCommands.DataSet:= cdsCommands;
-        fmConfig.TortoiseSVNProcFileName:= FTortoiseSVNProcFileName;
-        fmConfig.TortoiseGitProcFileName:= FTortoiseGitProcFileName;
+        fmConfig.TortoiseProcFileName:= FTortoiseProcFileName;
 
         if (fmConfig.ShowModal <> mrOk) then
           Abort;
 
-        FTortoiseSVNProcFileName:= fmConfig.TortoiseSVNProcFileName;
-        FTortoiseGitProcFileName:= fmConfig.TortoiseGitProcFileName;
+        FTortoiseProcFileName:= fmConfig.TortoiseProcFileName;
       except
         cdsCommands.SavePoint:= CommandsSavePoint;
         raise;
@@ -512,17 +496,6 @@ begin
   SetFormHeight;
   SetFormWidth;
   SetFormPosition;
-end;
-
-function TfmMain.GetTortoiseProcFileName(const AProjectType: string): string;
-begin
-  if (AProjectType = SVNSubDir) then
-    Exit(FTortoiseSVNProcFileName);
-
-  if (AProjectType = GitSubDir) then
-    Exit(FTortoiseGitProcFileName);
-
-  raise Exception.CreateFmt('Unknown Project type "%s"', [AProjectType]);
 end;
 
 end.

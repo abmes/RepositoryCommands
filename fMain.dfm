@@ -140,12 +140,6 @@ object fmMain: TfmMain
       Required = True
       FieldValueType = fvtBoolean
     end
-    object cdsProjectsPROJECT_TYPE: TSembaWideStringField
-      DisplayLabel = 'Project Type'
-      FieldName = 'PROJECT_TYPE'
-      Required = True
-      Size = 50
-    end
     object cdsProjects_MAX_NO: TAggregateField
       FieldName = '_MAX_NO'
       Active = True

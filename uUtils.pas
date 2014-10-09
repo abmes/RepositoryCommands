@@ -8,15 +8,52 @@ function GetLastToken(const AStr: string; ADelimiter: Char): string;
 function VarToInt(const AValue: Variant): Integer;
 function GetTaskBarHeight: Integer;
 function IsTaskBarAtBottom: Boolean;
+function RepositoryTypeName: string;
+function RepositoryTypeSubDirName: string;
+function DefaultTortoiseProcFileName: string;
 
 const
-  SVNSubDir = '.svn';
-  GitSubDir = '.git';
+  RepositoryTypeNameSVN = 'svn';
+  RepositoryTypeNameGit = 'git';
 
 implementation
 
 uses
   JclShell, SysUtils, JclStrings, StrUtils, Variants, Windows, Classes;
+
+function RepositoryTypeName: string;
+var
+  Param: string;
+begin
+  if (ParamCount = 0) then
+    Exit(RepositoryTypeNameGit);
+
+  Param:= LowerCase(ParamStr(1));
+
+  if (Param <> RepositoryTypeNameSVN) and (Param <> RepositoryTypeNameGit) then
+    raise Exception.CreateFmt('Unknown repository type "%s"', [Param])
+  else
+    Result:= Param;
+end;
+
+function RepositoryTypeSubDirName: string;
+begin
+  Result:= Format('.%s', [RepositoryTypeName]);
+end;
+
+function DefaultTortoiseProcFileName: string;
+const
+  DefaultTortoiseSVNProcFileName = '\TortoiseSVN\bin\TortoiseProc.exe';
+  DefaultTortoiseGitProcFileName = '\TortoiseGit\bin\TortoiseGitProc.exe';
+begin
+  if (RepositoryTypeName = RepositoryTypeNameSVN) then
+    Exit(DefaultTortoiseSVNProcFileName);
+
+  if (RepositoryTypeName = RepositoryTypeNameGit) then
+    Exit(DefaultTortoiseGitProcFileName);
+
+  raise Exception.Create('Unknown repository type');
+end;
 
 procedure ExecCommandAndHalt(const AExeFileName, AArguments: string);
 var
