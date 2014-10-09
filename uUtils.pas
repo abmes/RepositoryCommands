@@ -31,7 +31,6 @@ begin
   Halt(0);
 end;
 
-
 procedure OpenDirectoryAndHalt(const ADirectory: string);
 begin
   if not DirectoryExists(ADirectory) then
