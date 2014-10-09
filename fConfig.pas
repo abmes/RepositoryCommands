@@ -13,7 +13,7 @@ type
 
 type
   TfmConfig = class(TForm)
-    dsSCMCommands: TDataSource;
+    dsCommands: TDataSource;
     dsProjects: TDataSource;
     pnlOkCancelButtons: TPanel;
     btnCancel: TBitBtn;
@@ -24,12 +24,12 @@ type
     fneTortoiseGitProcFileName: TJvFilenameEdit;
     gbProjects: TGroupBox;
     grdProjects: TSembaDBGrid;
-    gbSCMCommands: TGroupBox;
-    grdSCMCommands: TSembaDBGrid;
+    gbCommands: TGroupBox;
+    grdCommands: TSembaDBGrid;
     alMain: TActionList;
     actAddProject: TAction;
     navProjects: TDBColorNavigator;
-    navSCMCommands: TDBColorNavigator;
+    navCommands: TDBColorNavigator;
     sdProjectDir: TJvSelectDirectory;
     actMoveProjectUp: TAction;
     actMoveProjectDown: TAction;
@@ -83,7 +83,7 @@ begin
   if (Length(TDirectory.GetDirectories(sdProjectDir.Directory, GitSubDir)) = 1) then
     Exit(GitSubDir);
 
-  raise Exception.Create('Unknown SCM type!');
+  raise Exception.Create('Unknown Repository type!');
 end;
 
 procedure TfmConfig.actAddProjectExecute(Sender: TObject);
@@ -141,18 +141,18 @@ begin
       CheckRequiredFileName(fneTortoiseGitProcFileName, 'TortoiseGitProc');
 
       dsProjects.DataSet.CheckBrowseMode;
-      dsSCMCommands.DataSet.CheckBrowseMode;
+      dsCommands.DataSet.CheckBrowseMode;
     end;
 end;
 
 procedure TfmConfig.actMoveCommandDownExecute(Sender: TObject);
 begin
-  MoveRecord(dsSCMCommands.DataSet, 'COMMAND_NO', mdDown);
+  MoveRecord(dsCommands.DataSet, 'COMMAND_NO', mdDown);
 end;
 
 procedure TfmConfig.actMoveCommandUpExecute(Sender: TObject);
 begin
-  MoveRecord(dsSCMCommands.DataSet, 'COMMAND_NO', mdUp);
+  MoveRecord(dsCommands.DataSet, 'COMMAND_NO', mdUp);
 end;
 
 procedure TfmConfig.actMoveProjectDownExecute(Sender: TObject);

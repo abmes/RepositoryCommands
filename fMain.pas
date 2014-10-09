@@ -12,17 +12,17 @@ type
     alMain: TActionList;
     actConfig: TAction;
     cdsProjects: TSembaClientDataSet;
-    cdsSCMCommands: TSembaClientDataSet;
+    cdsCommands: TSembaClientDataSet;
     dsProjectCommands: TDataSource;
-    cdsSCMCommandsCOMMAND_NAME: TSembaWideStringField;
-    cdsSCMCommandsCOMMAND_ARGUMENTS: TSembaWideStringField;
-    cdsSCMCommandsIS_FAVORITE: TSembaFloatField;
+    cdsCommandsCOMMAND_NAME: TSembaWideStringField;
+    cdsCommandsCOMMAND_ARGUMENTS: TSembaWideStringField;
+    cdsCommandsIS_FAVORITE: TSembaFloatField;
     cdsProjectsPROJECT_NAME: TSembaWideStringField;
     cdsProjectsPROJECT_DIR: TSembaWideStringField;
     cdsProjectsIS_FAVORITE: TSembaFloatField;
     cdsProjectCommands: TSembaClientDataSet;
     cdsProjectsPROJECT_NO: TSembaFloatField;
-    cdsSCMCommandsCOMMAND_NO: TSembaFloatField;
+    cdsCommandsCOMMAND_NO: TSembaFloatField;
     pnlMain: TPanel;
     grdProjectCommands: TSembaDBGrid;
     actShowMore: TAction;
@@ -32,7 +32,7 @@ type
     pnlShowMore: TPanel;
     btnShowMore: TSpeedButton;
     cdsProjects_MAX_NO: TAggregateField;
-    cdsSCMCommands_MAX_NO: TAggregateField;
+    cdsCommands_MAX_NO: TAggregateField;
     cdsProjectsPROJECT_TYPE: TSembaWideStringField;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -42,7 +42,7 @@ type
     procedure actConfigExecute(Sender: TObject);
     procedure grdProjectCommandsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure cdsProjectsNewRecord(DataSet: TDataSet);
-    procedure cdsSCMCommandsNewRecord(DataSet: TDataSet);
+    procedure cdsCommandsNewRecord(DataSet: TDataSet);
     procedure grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumnEh;
       State: TGridDrawState);
   private
@@ -75,12 +75,12 @@ uses
   dwJumpLists, Registry, Math, fConfig, JclStrings, uUtils, StrUtils;
 
 const
-  RegKeySembaSCMProjects = 'Software\SEMBA\SembaSCMProjects';
+  RegKeySembaRepositories = 'Software\SEMBA\SembaRepositories';
 
   RegValueTortoiseSVNProcFileName = 'TortoiseSVNProcFileName';
   RegValueTortoiseGitProcFileName = 'TortoiseGitProcFileName';
   RegValueProjects = 'Projects';
-  RegValueSCMCommands = 'SCMCommands';
+  RegValueCommands = 'Commands';
 
   EnvVarProgramFiles = 'ProgramW6432';
   EnvVarProgramFilesX86 = 'ProgramFiles(x86)';
@@ -140,12 +140,12 @@ begin
   Reg:= TRegistry.Create;
   try
     Reg.RootKey:= HKEY_CURRENT_USER;
-    if Reg.OpenKey(RegKeySembaSCMProjects, False) then
+    if Reg.OpenKey(RegKeySembaRepositories, False) then
       try
         FTortoiseSVNProcFileName:= Reg.ReadString(RegValueTortoiseSVNProcFileName);
         FTortoiseGitProcFileName:= Reg.ReadString(RegValueTortoiseGitProcFileName);
         LoadDataSet(cdsProjects, Reg, RegValueProjects);
-        LoadDataSet(cdsSCMCommands, Reg, RegValueSCMCommands);
+        LoadDataSet(cdsCommands, Reg, RegValueCommands);
       finally
         Reg.CloseKey;
       end;
@@ -159,11 +159,11 @@ begin
   if (FTortoiseGitProcFileName = '') then
     FTortoiseGitProcFileName:= GetDefaultTortoiseProcFileName(DefaultTortoiseGitProcFileName);
 
-  if cdsSCMCommands.IsEmpty then
+  if cdsCommands.IsEmpty then
     begin
-      cdsSCMCommands.AppendRecord([1, 'Changes', '/command:repostatus /path:%ProjectDir%', 1]);
-      cdsSCMCommands.AppendRecord([2, 'Update', '/command:update /path:%ProjectDir%', 1]);
-      cdsSCMCommands.AppendRecord([3, 'Log', '/command:log /path:%ProjectDir%', 0]);
+      cdsCommands.AppendRecord([1, 'Changes', '/command:repostatus /path:%ProjectDir%', 1]);
+      cdsCommands.AppendRecord([2, 'Update', '/command:update /path:%ProjectDir%', 1]);
+      cdsCommands.AppendRecord([3, 'Log', '/command:log /path:%ProjectDir%', 0]);
     end;
 end;
 
@@ -188,11 +188,11 @@ begin
   Reg:= TRegistry.Create;
   try
     Reg.RootKey:= HKEY_CURRENT_USER;
-    Reg.OpenKey(RegKeySembaSCMProjects, True);
+    Reg.OpenKey(RegKeySembaRepositories, True);
     try
       Reg.WriteString(RegValueTortoiseSVNProcFileName, FTortoiseSVNProcFileName);
       Reg.WriteString(RegValueTortoiseGitProcFileName, FTortoiseGitProcFileName);
-      SaveDataSet(cdsSCMCommands, Reg, RegValueSCMCommands);
+      SaveDataSet(cdsCommands, Reg, RegValueCommands);
       SaveDataSet(cdsProjects, Reg, RegValueProjects);
     finally
       Reg.CloseKey;
@@ -223,11 +223,11 @@ begin
   AddFieldDef('PROJECT_TYPE', ftWideString, 50);
   AddFieldDef('IS_FAVORITE', ftFloat);
 
-  cdsSCMCommands.First;
-  while not cdsSCMCommands.Eof do
+  cdsCommands.First;
+  while not cdsCommands.Eof do
     begin
-      AddFieldDef(CommandPrefix + cdsSCMCommandsCOMMAND_NO.AsString, ftWideString, 250);
-      cdsSCMCommands.Next;
+      AddFieldDef(CommandPrefix + cdsCommandsCOMMAND_NO.AsString, ftWideString, 250);
+      cdsCommands.Next;
     end;
 
   cdsProjectCommands.CreateDataSet;
@@ -242,11 +242,11 @@ begin
         cdsProjectCommands.FieldByName('PROJECT_TYPE').Assign(cdsProjectsPROJECT_TYPE);
         cdsProjectCommands.FieldByName('IS_FAVORITE').Assign(cdsProjectsIS_FAVORITE);
 
-        cdsSCMCommands.First;
-        while not cdsSCMCommands.Eof do
+        cdsCommands.First;
+        while not cdsCommands.Eof do
           begin
-            cdsProjectCommands.FieldByName(CommandPrefix + cdsSCMCommandsCOMMAND_NO.AsString).Assign(cdsSCMCommandsCOMMAND_NAME);
-            cdsSCMCommands.Next;
+            cdsProjectCommands.FieldByName(CommandPrefix + cdsCommandsCOMMAND_NO.AsString).Assign(cdsCommandsCOMMAND_NAME);
+            cdsCommands.Next;
           end;
 
         cdsProjectCommands.Post;
@@ -284,11 +284,11 @@ begin
 
   AddColumn('PROJECT_NAME', ProjectNameColumnWidth, False);
 
-  cdsSCMCommands.First;
-  while not cdsSCMCommands.Eof do
+  cdsCommands.First;
+  while not cdsCommands.Eof do
     begin
-      AddColumn(CommandPrefix + cdsSCMCommandsCOMMAND_NO.AsString, CommandColumnWidth, True);
-      cdsSCMCommands.Next;
+      AddColumn(CommandPrefix + cdsCommandsCOMMAND_NO.AsString, CommandColumnWidth, True);
+      cdsCommands.Next;
     end;
 end;
 
@@ -299,7 +299,7 @@ begin
   RefreshGridColumns;
 
   cdsProjects.First;
-  cdsSCMCommands.First;
+  cdsCommands.First;
 
   RecalcFormDimensionsAndPosition;
 end;
@@ -318,14 +318,14 @@ begin
   ClientWidth:=
     4 + // bevel
     ProjectNameColumnWidth +
-    cdsSCMCommands.RecordCount * CommandColumnWidth;
+    cdsCommands.RecordCount * CommandColumnWidth;
 end;
 
 procedure TfmMain.SetFormPosition;
 
   function CalcLeft: Integer;
   begin
-    Result:= FSavedMousePos.X - ProjectNameColumnWidth - ((cdsSCMCommands.RecordCount * CommandColumnWidth) div 2);
+    Result:= FSavedMousePos.X - ProjectNameColumnWidth - ((cdsCommands.RecordCount * CommandColumnWidth) div 2);
     Result:= Max(Result, 0);
     Result:= Min(Result, Screen.Width - Width);
   end;
@@ -342,7 +342,7 @@ end;
 procedure TfmMain.FormCreate(Sender: TObject);
 begin
   cdsProjects.CreateDataSet;
-  cdsSCMCommands.CreateDataSet;
+  cdsCommands.CreateDataSet;
 
   LoadConfig;
 
@@ -381,21 +381,21 @@ begin
             Category:= JumpLists.Categories.Add;
             Category.Title:= cdsProjectsPROJECT_NAME.AsString;
 
-            cdsSCMCommands.First;
-            while not cdsSCMCommands.eof do
+            cdsCommands.First;
+            while not cdsCommands.eof do
               begin
-                if cdsSCMCommandsIS_FAVORITE.AsBoolean then
+                if cdsCommandsIS_FAVORITE.AsBoolean then
                   begin
                     Task:= Category.Items.Add;
                     Task.ObjectType:= lotShellLink;
-                    Task.ShellLink.DisplayName:= cdsSCMCommandsCOMMAND_NAME.AsString;
+                    Task.ShellLink.DisplayName:= cdsCommandsCOMMAND_NAME.AsString;
                     Task.ShellLink.Arguments:=
                       Format('%s "%s"', [
                         GetTortoiseProcFileName(cdsProjectsPROJECT_TYPE.AsString),
-                        StringReplace(cdsSCMCommandsCOMMAND_ARGUMENTS.AsString, ProjectPathMacro, cdsProjectsPROJECT_DIR.AsString, [rfReplaceAll])]);
+                        StringReplace(cdsCommandsCOMMAND_ARGUMENTS.AsString, ProjectPathMacro, cdsProjectsPROJECT_DIR.AsString, [rfReplaceAll])]);
                   end;
 
-                cdsSCMCommands.Next
+                cdsCommands.Next
               end;
           end;
 
@@ -417,12 +417,12 @@ begin
 
   Assert(StartsStr('CMD_', Column.FieldName));
 
-  if not cdsSCMCommands.Locate('COMMAND_NO', StrToInt(GetLastToken(Column.FieldName, '_')), []) then
+  if not cdsCommands.Locate('COMMAND_NO', StrToInt(GetLastToken(Column.FieldName, '_')), []) then
     raise Exception.Create('Internal error: Command not found');
 
   Arguments:=
     StringReplace(
-      cdsSCMCommandsCOMMAND_ARGUMENTS.AsString,
+      cdsCommandsCOMMAND_ARGUMENTS.AsString,
       ProjectPathMacro,
       cdsProjectCommands.FieldByName('PROJECT_DIR').AsString,
       [rfReplaceAll]);
@@ -456,16 +456,16 @@ procedure TfmMain.actConfigExecute(Sender: TObject);
 var
   fmConfig: TfmConfig;
   ProjectsSavePoint: Integer;
-  SCMCommandsSavePoint: Integer;
+  CommandsSavePoint: Integer;
 begin
   fmConfig:= TfmConfig.Create(Self);
   try
     ProjectsSavePoint:= cdsProjects.SavePoint;
     try
-      SCMCommandsSavePoint:= cdsSCMCommands.SavePoint;
+      CommandsSavePoint:= cdsCommands.SavePoint;
       try
         fmConfig.dsProjects.DataSet:= cdsProjects;
-        fmConfig.dsSCMCommands.DataSet:= cdsSCMCommands;
+        fmConfig.dsCommands.DataSet:= cdsCommands;
         fmConfig.TortoiseSVNProcFileName:= FTortoiseSVNProcFileName;
         fmConfig.TortoiseGitProcFileName:= FTortoiseGitProcFileName;
 
@@ -475,7 +475,7 @@ begin
         FTortoiseSVNProcFileName:= fmConfig.TortoiseSVNProcFileName;
         FTortoiseGitProcFileName:= fmConfig.TortoiseGitProcFileName;
       except
-        cdsSCMCommands.SavePoint:= SCMCommandsSavePoint;
+        cdsCommands.SavePoint:= CommandsSavePoint;
         raise;
       end;
     except
@@ -495,10 +495,10 @@ begin
   cdsProjectsIS_FAVORITE.AsBoolean:= True;
 end;
 
-procedure TfmMain.cdsSCMCommandsNewRecord(DataSet: TDataSet);
+procedure TfmMain.cdsCommandsNewRecord(DataSet: TDataSet);
 begin
-  cdsSCMCommandsCOMMAND_NO.AsInteger:= VarToInt(cdsSCMCommands_MAX_NO.AsVariant) + 1;
-  cdsSCMCommandsIS_FAVORITE.AsBoolean:= True;
+  cdsCommandsCOMMAND_NO.AsInteger:= VarToInt(cdsCommands_MAX_NO.AsVariant) + 1;
+  cdsCommandsIS_FAVORITE.AsBoolean:= True;
 end;
 
 procedure TfmMain.grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;

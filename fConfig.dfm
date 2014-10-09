@@ -155,12 +155,12 @@ object fmConfig: TfmConfig
       BeforeAction = navProjectsBeforeAction
     end
   end
-  object gbSCMCommands: TGroupBox
+  object gbCommands: TGroupBox
     Left = 8
     Top = 376
     Width = 729
     Height = 177
-    Caption = ' SCM Commands '
+    Caption = ' Commands '
     TabOrder = 3
     object btnMoveCommandDown: TSpeedButton
       Left = 700
@@ -183,12 +183,12 @@ object fmConfig: TfmConfig
       Height = 13
       Caption = 'Possible Macro: %ProjectDir%'
     end
-    object grdSCMCommands: TSembaDBGrid
+    object grdCommands: TSembaDBGrid
       Left = 16
       Top = 48
       Width = 681
       Height = 117
-      DataSource = dsSCMCommands
+      DataSource = dsCommands
       DynProps = <>
       FooterParams.Color = clWindow
       IndicatorOptions = [gioShowRowIndicatorEh]
@@ -225,12 +225,12 @@ object fmConfig: TfmConfig
       object RowDetailData: TRowDetailPanelControlEh
       end
     end
-    object navSCMCommands: TDBColorNavigator
+    object navCommands: TDBColorNavigator
       Left = 16
       Top = 22
       Width = 56
       Height = 25
-      DataSource = dsSCMCommands
+      DataSource = dsCommands
       VisibleButtons = [nbInsert, nbDelete]
       TabOrder = 1
     end
@@ -258,7 +258,7 @@ object fmConfig: TfmConfig
       Text = ''
     end
   end
-  object dsSCMCommands: TDataSource
+  object dsCommands: TDataSource
     Left = 240
   end
   object dsProjects: TDataSource

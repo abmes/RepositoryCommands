@@ -153,7 +153,7 @@ object fmMain: TfmMain
       Expression = 'Max(PROJECT_NO)'
     end
   end
-  object cdsSCMCommands: TSembaClientDataSet
+  object cdsCommands: TSembaClientDataSet
     Aggregates = <>
     AggregatesActive = True
     FieldDefs = <>
@@ -161,32 +161,32 @@ object fmMain: TfmMain
     IndexFieldNames = 'COMMAND_NO'
     Params = <>
     StoreDefs = True
-    OnNewRecord = cdsSCMCommandsNewRecord
+    OnNewRecord = cdsCommandsNewRecord
     Left = 272
-    object cdsSCMCommandsCOMMAND_NO: TSembaFloatField
+    object cdsCommandsCOMMAND_NO: TSembaFloatField
       DisplayLabel = 'No'
       FieldName = 'COMMAND_NO'
       Required = True
     end
-    object cdsSCMCommandsCOMMAND_NAME: TSembaWideStringField
+    object cdsCommandsCOMMAND_NAME: TSembaWideStringField
       DisplayLabel = 'Command Name'
       FieldName = 'COMMAND_NAME'
       Required = True
       Size = 50
     end
-    object cdsSCMCommandsCOMMAND_ARGUMENTS: TSembaWideStringField
+    object cdsCommandsCOMMAND_ARGUMENTS: TSembaWideStringField
       DisplayLabel = 'Arguments'
       FieldName = 'COMMAND_ARGUMENTS'
       Required = True
       Size = 250
     end
-    object cdsSCMCommandsIS_FAVORITE: TSembaFloatField
+    object cdsCommandsIS_FAVORITE: TSembaFloatField
       DisplayLabel = 'Favorite'
       FieldName = 'IS_FAVORITE'
       Required = True
       FieldValueType = fvtBoolean
     end
-    object cdsSCMCommands_MAX_NO: TAggregateField
+    object cdsCommands_MAX_NO: TAggregateField
       FieldName = '_MAX_NO'
       Active = True
       DisplayName = ''
