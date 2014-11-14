@@ -154,6 +154,24 @@ begin
 
   if (FTortoiseProcFileName = '') then
     FTortoiseProcFileName:= GetDefaultTortoiseProcFileName(DefaultTortoiseProcFileName);
+
+  if cdsCommands.IsEmpty then
+    begin
+      if (RepositoryTypeName = RepositoryTypeNameSVN) then
+        begin
+          cdsCommands.AppendRecord([1, 'Changes', '/command:repostatus /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([2, 'Update', '/command:update /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([3, 'Log', '/command:log /path:%ProjectDir%', 1]);
+        end;
+
+      if (RepositoryTypeName = RepositoryTypeNameGit) then
+        begin
+          cdsCommands.AppendRecord([1, 'Push', '/command:push /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([2, 'Pull', '/command:pull /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([3, 'Changes', '/command:repostatus /path:%ProjectDir%%', 1]);
+          cdsCommands.AppendRecord([4, 'Log', '/command:log /path:%ProjectDir%', 1]);
+        end;
+    end;
 end;
 
 procedure TfmMain.SaveConfig;
