@@ -166,9 +166,10 @@ begin
 
       if (RepositoryTypeName = RepositoryTypeNameGit) then
         begin
-          cdsCommands.AppendRecord([1, 'Pull', '/command:pull /path:%ProjectDir%', 1]);
-          cdsCommands.AppendRecord([2, 'Changes', '/command:repostatus /path:%ProjectDir%%', 1]);
-          cdsCommands.AppendRecord([3, 'Log', '/command:log /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([1, 'Push', '/command:push /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([2, 'Pull', '/command:pull /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([3, 'Changes', '/command:repostatus /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([4, 'Log', '/command:log /path:%ProjectDir%', 1]);
         end;
     end;
 end;
