@@ -90,9 +90,9 @@ const
 
 function TfmMain.ConfigurationRegKey: string;
 const
-  RegKeySembaRepositories = 'Software\SEMBA\SembaRepositories';
+  RegKeyAbmesRepositoryCommands = 'Software\Abmes\RepositoryCommands';
 begin
-  Result:= RegKeySembaRepositories + '\' + RepositoryTypeName;
+  Result:= RegKeyAbmesRepositoryCommands + '\' + RepositoryTypeName;
 end;
 
 function TfmMain.GetDefaultTortoiseProcFileName(const ATortoiseProcFileName: string): string;

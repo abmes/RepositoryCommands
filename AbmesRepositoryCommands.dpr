@@ -1,4 +1,4 @@
-program SembaRepositories;
+program AbmesRepositoryCommands;
 
 uses
   MidasLib,
@@ -17,7 +17,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'Semba Repositories';
+  Application.Title := 'Abmes Repository Commands';
   Application.CreateForm(TfmMain, fmMain);
   Application.Run;
 end.

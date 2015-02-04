@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{48C14240-AB93-4A4A-8529-A5AD97067641}</ProjectGuid>
         <ProjectVersion>14.4</ProjectVersion>
-        <MainSource>SembaRepositories.dpr</MainSource>
+        <MainSource>AbmesRepositoryCommands.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <AppType>Application</AppType>
@@ -64,7 +64,6 @@
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <Icon_MainIcon>SembaSVNProjects_Icon7.ico</Icon_MainIcon>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
@@ -73,7 +72,6 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Icon_MainIcon>Icon.ico</Icon_MainIcon>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -153,7 +151,7 @@
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp170.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
                 <Source>
-                    <Source Name="MainSource">SembaRepositories.dpr</Source>
+                    <Source Name="MainSource">AbmesRepositoryCommands.dpr</Source>
                 </Source>
             </Delphi.Personality>
             <Platforms>
