@@ -4,25 +4,14 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DB, SembaFields, DBClient, SembaClientDataSet, DBGridEh, SembaDBGrid,
+  Dialogs, StdCtrls, DB, DBClient, DBGridEh, SembaDBGrid,
   Buttons, ActnList, AppEvnts, ExtCtrls, GridsEh, DBGridEhGrouping, System.Actions, DBAxisGridsEh;
 
 type
   TfmMain = class(TForm)
     alMain: TActionList;
     actConfig: TAction;
-    cdsProjects: TSembaClientDataSet;
-    cdsCommands: TSembaClientDataSet;
     dsProjectCommands: TDataSource;
-    cdsCommandsCOMMAND_NAME: TSembaWideStringField;
-    cdsCommandsCOMMAND_ARGUMENTS: TSembaWideStringField;
-    cdsCommandsIS_FAVORITE: TSembaFloatField;
-    cdsProjectsPROJECT_NAME: TSembaWideStringField;
-    cdsProjectsPROJECT_DIR: TSembaWideStringField;
-    cdsProjectsIS_FAVORITE: TSembaFloatField;
-    cdsProjectCommands: TSembaClientDataSet;
-    cdsProjectsPROJECT_NO: TSembaFloatField;
-    cdsCommandsCOMMAND_NO: TSembaFloatField;
     pnlMain: TPanel;
     grdProjectCommands: TSembaDBGrid;
     actShowMore: TAction;
@@ -31,8 +20,19 @@ type
     btnConfig: TSpeedButton;
     pnlShowMore: TPanel;
     btnShowMore: TSpeedButton;
+    cdsProjects: TClientDataSet;
+    cdsProjectsPROJECT_NO: TFloatField;
+    cdsProjectsPROJECT_NAME: TWideStringField;
+    cdsProjectsPROJECT_DIR: TWideStringField;
+    cdsProjectsIS_FAVORITE: TBooleanField;
     cdsProjects_MAX_NO: TAggregateField;
+    cdsCommands: TClientDataSet;
+    cdsCommandsCOMMAND_NO: TFloatField;
+    cdsCommandsCOMMAND_NAME: TWideStringField;
+    cdsCommandsCOMMAND_ARGUMENTS: TWideStringField;
+    cdsCommandsIS_FAVORITE: TBooleanField;
     cdsCommands_MAX_NO: TAggregateField;
+    cdsProjectCommands: TClientDataSet;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure grdProjectCommandsCellClick(Column: TColumnEh);
@@ -40,10 +40,10 @@ type
     procedure aeAppEventsDeactivate(Sender: TObject);
     procedure actConfigExecute(Sender: TObject);
     procedure grdProjectCommandsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure cdsProjectsNewRecord(DataSet: TDataSet);
-    procedure cdsCommandsNewRecord(DataSet: TDataSet);
     procedure grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumnEh;
       State: TGridDrawState);
+    procedure cdsProjectsNewRecord(DataSet: TDataSet);
+    procedure cdsCommandsNewRecord(DataSet: TDataSet);
   private
     FTortoiseProcFileName: string;
     FIsNearMousePosition: Boolean;
@@ -114,7 +114,7 @@ end;
 
 procedure TfmMain.LoadConfig;
 
-  procedure LoadDataSet(ADataSet: TSembaClientDataSet; AReg: TRegistry; const AValueName: string);
+  procedure LoadDataSet(ADataSet: TClientDataSet; AReg: TRegistry; const AValueName: string);
   var
     s: TMemoryStream;
     DataSize: Integer;
@@ -159,24 +159,24 @@ begin
     begin
       if (RepositoryTypeName = RepositoryTypeNameSVN) then
         begin
-          cdsCommands.AppendRecord([1, 'Changes', '/command:repostatus /path:%ProjectDir%', 1]);
-          cdsCommands.AppendRecord([2, 'Update', '/command:update /path:%ProjectDir%', 1]);
-          cdsCommands.AppendRecord([3, 'Log', '/command:log /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([1, 'Changes', '/command:repostatus /path:%ProjectDir%', True]);
+          cdsCommands.AppendRecord([2, 'Update', '/command:update /path:%ProjectDir%', True]);
+          cdsCommands.AppendRecord([3, 'Log', '/command:log /path:%ProjectDir%', True]);
         end;
 
       if (RepositoryTypeName = RepositoryTypeNameGit) then
         begin
-          cdsCommands.AppendRecord([1, 'Push', '/command:push /path:%ProjectDir%', 1]);
-          cdsCommands.AppendRecord([2, 'Pull', '/command:pull /path:%ProjectDir%', 1]);
-          cdsCommands.AppendRecord([3, 'Changes', '/command:repostatus /path:%ProjectDir%', 1]);
-          cdsCommands.AppendRecord([4, 'Log', '/command:log /path:%ProjectDir%', 1]);
+          cdsCommands.AppendRecord([1, 'Push', '/command:push /path:%ProjectDir%', True]);
+          cdsCommands.AppendRecord([2, 'Pull', '/command:pull /path:%ProjectDir%', True]);
+          cdsCommands.AppendRecord([3, 'Changes', '/command:repostatus /path:%ProjectDir%', True]);
+          cdsCommands.AppendRecord([4, 'Log', '/command:log /path:%ProjectDir%', True]);
         end;
     end;
 end;
 
 procedure TfmMain.SaveConfig;
 
-  procedure SaveDataSet(ADataSet: TSembaClientDataSet; AReg: TRegistry; const ARegValueName: string);
+  procedure SaveDataSet(ADataSet: TClientDataSet; AReg: TRegistry; const ARegValueName: string);
   var
     s: TMemoryStream;
   begin
@@ -226,7 +226,7 @@ begin
 
   AddFieldDef('PROJECT_NAME', ftWideString, 50);
   AddFieldDef('PROJECT_DIR', ftWideString, 250);
-  AddFieldDef('IS_FAVORITE', ftFloat);
+  AddFieldDef('IS_FAVORITE', ftBoolean);
 
   cdsCommands.First;
   while not cdsCommands.Eof do
@@ -491,16 +491,16 @@ begin
   RefreshProjectCommands;
 end;
 
-procedure TfmMain.cdsProjectsNewRecord(DataSet: TDataSet);
-begin
-  cdsProjectsPROJECT_NO.AsInteger:= VarToInt(cdsProjects_MAX_NO.AsVariant) + 1;
-  cdsProjectsIS_FAVORITE.AsBoolean:= True;
-end;
-
 procedure TfmMain.cdsCommandsNewRecord(DataSet: TDataSet);
 begin
   cdsCommandsCOMMAND_NO.AsInteger:= VarToInt(cdsCommands_MAX_NO.AsVariant) + 1;
   cdsCommandsIS_FAVORITE.AsBoolean:= True;
+end;
+
+procedure TfmMain.cdsProjectsNewRecord(DataSet: TDataSet);
+begin
+  cdsProjectsPROJECT_NO.AsInteger:= VarToInt(cdsProjects_MAX_NO.AsVariant) + 1;
+  cdsProjectsIS_FAVORITE.AsBoolean:= True;
 end;
 
 procedure TfmMain.grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;

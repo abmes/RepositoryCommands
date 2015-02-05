@@ -107,40 +107,44 @@ object fmMain: TfmMain
       OnExecute = actShowMoreExecute
     end
   end
-  object cdsProjects: TSembaClientDataSet
+  object dsProjectCommands: TDataSource
+    DataSet = cdsProjectCommands
+    Left = 368
+  end
+  object aeAppEvents: TApplicationEvents
+    OnDeactivate = aeAppEventsDeactivate
+    Left = 64
+  end
+  object cdsProjects: TClientDataSet
     Aggregates = <>
     AggregatesActive = True
-    FieldDefs = <>
-    IndexDefs = <>
     IndexFieldNames = 'PROJECT_NO'
     Params = <>
-    StoreDefs = True
     OnNewRecord = cdsProjectsNewRecord
     Left = 240
-    object cdsProjectsPROJECT_NO: TSembaFloatField
+    object cdsProjectsPROJECT_NO: TFloatField
       DisplayLabel = 'No'
       FieldName = 'PROJECT_NO'
       Required = True
     end
-    object cdsProjectsPROJECT_NAME: TSembaWideStringField
+    object cdsProjectsPROJECT_NAME: TWideStringField
       DisplayLabel = 'Project Name'
       FieldName = 'PROJECT_NAME'
       Required = True
       Size = 50
     end
-    object cdsProjectsPROJECT_DIR: TSembaWideStringField
+    object cdsProjectsPROJECT_DIR: TWideStringField
       DisplayLabel = 'Project Dir'
       FieldName = 'PROJECT_DIR'
       Required = True
       Size = 250
     end
-    object cdsProjectsIS_FAVORITE: TSembaFloatField
+    object cdsProjectsIS_FAVORITE: TBooleanField
       Alignment = taCenter
       DisplayLabel = 'Favorite'
       FieldName = 'IS_FAVORITE'
       Required = True
-      DisplayBoolValues = #1062';'
-      FieldValueType = fvtBoolean
+      DisplayValues = #1062';'
     end
     object cdsProjects_MAX_NO: TAggregateField
       FieldName = '_MAX_NO'
@@ -149,40 +153,36 @@ object fmMain: TfmMain
       Expression = 'Max(PROJECT_NO)'
     end
   end
-  object cdsCommands: TSembaClientDataSet
+  object cdsCommands: TClientDataSet
     Aggregates = <>
     AggregatesActive = True
-    FieldDefs = <>
-    IndexDefs = <>
     IndexFieldNames = 'COMMAND_NO'
     Params = <>
-    StoreDefs = True
     OnNewRecord = cdsCommandsNewRecord
     Left = 272
-    object cdsCommandsCOMMAND_NO: TSembaFloatField
+    object cdsCommandsCOMMAND_NO: TFloatField
       DisplayLabel = 'No'
       FieldName = 'COMMAND_NO'
       Required = True
     end
-    object cdsCommandsCOMMAND_NAME: TSembaWideStringField
+    object cdsCommandsCOMMAND_NAME: TWideStringField
       DisplayLabel = 'Command Name'
       FieldName = 'COMMAND_NAME'
       Required = True
       Size = 50
     end
-    object cdsCommandsCOMMAND_ARGUMENTS: TSembaWideStringField
+    object cdsCommandsCOMMAND_ARGUMENTS: TWideStringField
       DisplayLabel = 'Arguments'
       FieldName = 'COMMAND_ARGUMENTS'
       Required = True
       Size = 250
     end
-    object cdsCommandsIS_FAVORITE: TSembaFloatField
+    object cdsCommandsIS_FAVORITE: TBooleanField
       Alignment = taCenter
       DisplayLabel = 'Favorite'
       FieldName = 'IS_FAVORITE'
       Required = True
-      DisplayBoolValues = #1062';'
-      FieldValueType = fvtBoolean
+      DisplayValues = #1062';'
     end
     object cdsCommands_MAX_NO: TAggregateField
       FieldName = '_MAX_NO'
@@ -191,19 +191,14 @@ object fmMain: TfmMain
       Expression = 'Max(COMMAND_NO)'
     end
   end
-  object dsProjectCommands: TDataSource
-    DataSet = cdsProjectCommands
-    Left = 368
-  end
-  object cdsProjectCommands: TSembaClientDataSet
+  object cdsProjectCommands: TClientDataSet
     Aggregates = <>
-    Filter = 'IS_FAVORITE = 1'
+    Filter = 'IS_FAVORITE = True'
     Filtered = True
+    FieldDefs = <>
+    IndexDefs = <>
     Params = <>
+    StoreDefs = True
     Left = 336
-  end
-  object aeAppEvents: TApplicationEvents
-    OnDeactivate = aeAppEventsDeactivate
-    Left = 64
   end
 end
