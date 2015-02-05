@@ -135,9 +135,11 @@ object fmMain: TfmMain
       Size = 250
     end
     object cdsProjectsIS_FAVORITE: TSembaFloatField
+      Alignment = taCenter
       DisplayLabel = 'Favorite'
       FieldName = 'IS_FAVORITE'
       Required = True
+      DisplayBoolValues = #1062';'
       FieldValueType = fvtBoolean
     end
     object cdsProjects_MAX_NO: TAggregateField
@@ -175,9 +177,11 @@ object fmMain: TfmMain
       Size = 250
     end
     object cdsCommandsIS_FAVORITE: TSembaFloatField
+      Alignment = taCenter
       DisplayLabel = 'Favorite'
       FieldName = 'IS_FAVORITE'
       Required = True
+      DisplayBoolValues = #1062';'
       FieldValueType = fvtBoolean
     end
     object cdsCommands_MAX_NO: TAggregateField

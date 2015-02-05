@@ -54,8 +54,8 @@
         <VerInfo_Locale>1026</VerInfo_Locale>
         <DCC_UsePackage>rtl;vcl;vcldb;dbrtl;vclimg;vclx;Rave90VCL;bdertl;VclSmp;svnui;svn;TeeUI;TeeDB;Tee;vclactnband;vcldbx;vcltouch;xmlrtl;dsnap;dsnapcon;vclib;ibxpress;adortl;IndyCore;IndySystem;IndyProtocols;inet;intrawebdb_110_150;Intraweb_110_150;vclie;websnap;webdsnap;inetdb;inetdbbde;inetdbxpress;soaprtl;vclribbon;dbexpress;DbxCommonDriver;DataSnapIndy10ServerTransport;DataSnapProviderClient;DbxClientDriver;DataSnapClient;dbxcds;DataSnapServer;AzureCloud;DBXInterBaseDriver;DBXMySQLDriver;DBXFirebirdDriver;DBXSybaseASEDriver;DBXSybaseASADriver;DBXOracleDriver;DBXMSSQLDriver;DBXInformixDriver;DBXDb2Driver;CodeSiteExpressVcl;QR5RunDXE;EhLib150;EhLibDataDrivers150;xf40;SembaCTL;SembaUTL;SembaDBX;SembaBDE;Jcl;JvCore;JvStdCtrls;dxCoreD15;cxLibraryD15;dxDockingD15;dxBarD15;dxBarDBNavD15;dxBarExtDBItemsD15;dxBarExtItemsD15;dxRibbonD15;cxPageControlD15;cxEditorsD15;cxExtEditorsD15;cxGridD15;cxTreeListD15;dxmdsD15;dxComnD15;dxsbD15;dxdbtrD15;dxtrmdD15;dxorgcD15;dxdborD15;cxBarEditItemD15;cxTreeListdxBarPopupMenuD15;JclDeveloperTools;JclVcl;JclContainers;JvSystem;JvAppFrm;JvBands;JvDB;JvDlgs;JvBDE;JvControls;JvCmp;JvCrypt;JvCustom;JvDocking;JvDotNetCtrls;JvGlobus;JvHMI;JvJans;JvManagedThreads;JvMM;JvNet;JvPageComps;JvPascalInterpreter;JvPluginSystem;JvPrintPreview;JvRuntimeDesign;JvTimeFramework;JvWizards;JvXPCtrls;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_ImageBase>00400000</DCC_ImageBase>
-        <DCC_DcuOutput>d:\temp\dcu</DCC_DcuOutput>
-        <DCC_ExeOutput>d:\temp\exe</DCC_ExeOutput>
+        <DCC_DcuOutput>bin\dcu</DCC_DcuOutput>
+        <DCC_ExeOutput>bin\exe</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>

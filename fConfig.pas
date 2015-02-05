@@ -1,12 +1,13 @@
+{$WARN UNIT_PLATFORM OFF}
 unit fConfig;
 
 interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, DB, StdCtrls, Buttons, ExtCtrls, GridsEh, DBGridEh, SembaDBGrid, DBCtrls,
-  ActnList, ColorNavigator, JvBaseDlg, JvSelectDirectory, ImgList, Mask, JvExMask, JvToolEdit, DBGridEhGrouping,
-  System.Actions, DBAxisGridsEh;
+  Dialogs, DB, StdCtrls, Buttons, ExtCtrls, DBCtrls,
+  ActnList, ColorNavigator, ImgList, Mask,
+  System.Actions, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls, Vcl.ToolWin;
 
 type
   TMoveDirection = (mdUp, mdDown);
@@ -19,16 +20,12 @@ type
     btnCancel: TBitBtn;
     btnOk: TBitBtn;
     gbTortoiseProcFileName: TGroupBox;
-    fneTortoiseProcFileName: TJvFilenameEdit;
     gbProjects: TGroupBox;
-    grdProjects: TSembaDBGrid;
     gbCommands: TGroupBox;
-    grdCommands: TSembaDBGrid;
     alMain: TActionList;
     actAddProject: TAction;
     navProjects: TDBColorNavigator;
     navCommands: TDBColorNavigator;
-    sdProjectDir: TJvSelectDirectory;
     actMoveProjectUp: TAction;
     actMoveProjectDown: TAction;
     actMoveCommandUp: TAction;
@@ -39,6 +36,13 @@ type
     btnMoveCommandDown: TSpeedButton;
     btnMoveCommandUp: TSpeedButton;
     lblMacroHint: TLabel;
+    grdProjects: TDBGrid;
+    grdCommands: TDBGrid;
+    edtTortoiseProcFileName: TEdit;
+    odTortoiseProcFileName: TOpenDialog;
+    tlbSelectTortoiseProc: TToolBar;
+    btnSelectTortoiseProc: TToolButton;
+    actSelectTortoiseProc: TAction;
     procedure actAddProjectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actMoveProjectUpExecute(Sender: TObject);
@@ -46,12 +50,17 @@ type
     procedure actMoveCommandUpExecute(Sender: TObject);
     procedure actMoveCommandDownExecute(Sender: TObject);
     procedure navProjectsBeforeAction(Sender: TObject; Button: TNavigateBtn);
+    procedure grdProjectsDblClick(Sender: TObject);
+    procedure grdCommandsDblClick(Sender: TObject);
+    procedure grdCommandsCellClick(Column: TColumn);
+    procedure actSelectTortoiseProcExecute(Sender: TObject);
   private
     function GetTortoiseProcFileName: string;
     procedure SetTortoiseProcFileName(const Value: string);
     procedure MoveRecord(ADataSet: TDataSet; const ANoFieldName: string; AMoveDirection: TMoveDirection);
     function GetProjectName(const APath: string): string;
     procedure CheckProjectType(const APath: string);
+    procedure NegateBooleanField(ADataSet: TDataSet; const AFieldName: string);
   public
     property TortoiseProcFileName: string read GetTortoiseProcFileName write SetTortoiseProcFileName;
   end;
@@ -59,7 +68,7 @@ type
 implementation
 
 uses
-  IOUtils, DBConsts, uUtils, Types;
+  IOUtils, DBConsts, uUtils, Types, FileCtrl;
 
 {$R *.dfm}
 
@@ -77,14 +86,16 @@ begin
 end;
 
 procedure TfmConfig.actAddProjectExecute(Sender: TObject);
+var
+  ProjectDir: string;
 begin
-  if sdProjectDir.Execute then
+  if SelectDirectory('Project Dir', '', ProjectDir) then
     begin
       dsProjects.DataSet.Append;
       try
-        CheckProjectType(sdProjectDir.Directory);
-        dsProjects.DataSet.FieldByName('PROJECT_DIR').AsString:= sdProjectDir.Directory;
-        dsProjects.DataSet.FieldByName('PROJECT_NAME').AsString:= GetProjectName(sdProjectDir.Directory);
+        CheckProjectType(ProjectDir);
+        dsProjects.DataSet.FieldByName('PROJECT_DIR').AsString:= ProjectDir;
+        dsProjects.DataSet.FieldByName('PROJECT_NAME').AsString:= GetProjectName(ProjectDir);
         dsProjects.DataSet.Post;
       except
         dsProjects.DataSet.Cancel;
@@ -95,17 +106,57 @@ end;
 
 function TfmConfig.GetTortoiseProcFileName: string;
 begin
-  Result:= fneTortoiseProcFileName.Text;
+  Result:= edtTortoiseProcFileName.Text;
 end;
 
 procedure TfmConfig.SetTortoiseProcFileName(const Value: string);
 begin
-  fneTortoiseProcFileName.Text:= Value;
+  edtTortoiseProcFileName.Text:= Value;
+end;
+
+procedure TfmConfig.NegateBooleanField(ADataSet: TDataSet; const AFieldName: string);
+var
+  BooleanField: TField;
+begin
+  ADataSet.CheckBrowseMode;
+
+  ADataSet.DisableControls;
+  try
+    ADataSet.Edit;
+    try
+      BooleanField:= ADataSet.FieldByName(AFieldName);
+      BooleanField.AsBoolean:= not BooleanField.AsBoolean;
+      ADataSet.Post;
+    except
+      ADataSet.Cancel;
+      raise;
+    end;
+  finally
+    ADataSet.EnableControls;
+  end;
+end;
+
+procedure TfmConfig.grdProjectsDblClick(Sender: TObject);
+begin
+  NegateBooleanField(dsProjects.DataSet, 'IS_FAVORITE');
+end;
+
+procedure TfmConfig.grdCommandsDblClick(Sender: TObject);
+begin
+  NegateBooleanField(dsCommands.DataSet, 'IS_FAVORITE');
+end;
+
+procedure TfmConfig.grdCommandsCellClick(Column: TColumn);
+begin
+  if (Column.FieldName = 'IS_FAVORITE') then
+    grdCommands.Options:= grdCommands.Options - [dgEditing]
+  else
+    grdCommands.Options:= grdCommands.Options + [dgEditing];
 end;
 
 procedure TfmConfig.FormClose(Sender: TObject; var Action: TCloseAction);
 
-  procedure CheckRequiredFileName(AFileNameEdit: TJvFileNameEdit; const AFieldName: string);
+  procedure CheckRequiredFileName(AFileNameEdit: TEdit; const AFieldName: string);
   begin
     if (AFileNameEdit.Text = '') then
       begin
@@ -117,7 +168,7 @@ procedure TfmConfig.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if (ModalResult = mrOk) then
     begin
-      CheckRequiredFileName(fneTortoiseProcFileName, 'TortoiseProc');
+      CheckRequiredFileName(edtTortoiseProcFileName, 'TortoiseProc');
       dsProjects.DataSet.CheckBrowseMode;
       dsCommands.DataSet.CheckBrowseMode;
     end;
@@ -141,6 +192,21 @@ end;
 procedure TfmConfig.actMoveProjectUpExecute(Sender: TObject);
 begin
   MoveRecord(dsProjects.DataSet, 'PROJECT_NO', mdUp);
+end;
+
+procedure TfmConfig.actSelectTortoiseProcExecute(Sender: TObject);
+var
+  FileName: string;
+begin
+  if (edtTortoiseProcFileName.Text <> '') then
+    begin
+      FileName:= StringReplace(edtTortoiseProcFileName.Text, '"', '', [rfReplaceAll]);
+      odTortoiseProcFileName.InitialDir:= ExtractFilePath(FileName);
+      odTortoiseProcFileName.FileName:= ExtractFileName(FileName);
+    end;
+
+  if odTortoiseProcFileName.Execute() then
+    edtTortoiseProcFileName.Text:= Format('"%s"', [odTortoiseProcFileName.FileName]);
 end;
 
 procedure TfmConfig.MoveRecord(ADataSet: TDataSet; const ANoFieldName: string; AMoveDirection: TMoveDirection);
