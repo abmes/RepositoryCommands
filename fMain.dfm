@@ -27,32 +27,6 @@ object fmMain: TfmMain
     BevelKind = bkFlat
     BevelOuter = bvNone
     TabOrder = 0
-    object grdProjectCommands: TSembaDBGrid
-      Left = 0
-      Top = 0
-      Width = 396
-      Height = 126
-      Align = alClient
-      BorderStyle = bsNone
-      DataSource = dsProjectCommands
-      DefaultDrawing = False
-      DynProps = <>
-      EvenRowColor = 15137255
-      FooterParams.Color = clWindow
-      HorzScrollBar.Visible = False
-      IndicatorOptions = []
-      OddRowColor = clCream
-      Options = [dgTabs, dgConfirmDelete, dgCancelOnExit]
-      OptionsEh = [dghFixed3D, dghClearSelection, dghDialogFind, dghExtendVertLines]
-      RowHeight = 18
-      TabOrder = 0
-      VertScrollBar.VisibleMode = sbNeverShowEh
-      OnCellClick = grdProjectCommandsCellClick
-      OnDrawColumnCell = grdProjectCommandsDrawColumnCell
-      OnMouseMove = grdProjectCommandsMouseMove
-      object RowDetailData: TRowDetailPanelControlEh
-      end
-    end
     object pnlConfig: TPanel
       Left = 0
       Top = 144
@@ -60,7 +34,7 @@ object fmMain: TfmMain
       Height = 18
       Align = alBottom
       BevelOuter = bvNone
-      TabOrder = 1
+      TabOrder = 0
       Visible = False
       object btnConfig: TSpeedButton
         Left = 0
@@ -79,7 +53,7 @@ object fmMain: TfmMain
       Height = 18
       Align = alBottom
       BevelOuter = bvNone
-      TabOrder = 2
+      TabOrder = 1
       object btnShowMore: TSpeedButton
         Left = 0
         Top = 0
@@ -89,6 +63,32 @@ object fmMain: TfmMain
         Align = alClient
         Flat = True
       end
+    end
+    object grdProjectCommands: TDBGrid
+      Left = 0
+      Top = 0
+      Width = 396
+      Height = 126
+      Align = alClient
+      BorderStyle = bsNone
+      DataSource = dsProjectCommands
+      DefaultDrawing = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -15
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      Options = [dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+      ParentFont = False
+      TabOrder = 2
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -11
+      TitleFont.Name = 'Tahoma'
+      TitleFont.Style = []
+      OnCellClick = grdProjectCommandsCellClick
+      OnDrawColumnCell = grdProjectCommandsDrawColumnCell
+      OnMouseMove = grdProjectCommandsMouseMove
     end
   end
   object alMain: TActionList

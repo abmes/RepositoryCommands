@@ -4,8 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DB, DBClient, DBGridEh, SembaDBGrid,
-  Buttons, ActnList, AppEvnts, ExtCtrls, GridsEh, DBGridEhGrouping, System.Actions, DBAxisGridsEh;
+  Dialogs, StdCtrls, DB, DBClient, Buttons, ActnList, AppEvnts, ExtCtrls, System.Actions, Vcl.Grids,
+  Vcl.DBGrids;
 
 type
   TfmMain = class(TForm)
@@ -13,7 +13,6 @@ type
     actConfig: TAction;
     dsProjectCommands: TDataSource;
     pnlMain: TPanel;
-    grdProjectCommands: TSembaDBGrid;
     actShowMore: TAction;
     aeAppEvents: TApplicationEvents;
     pnlConfig: TPanel;
@@ -33,17 +32,18 @@ type
     cdsCommandsIS_FAVORITE: TBooleanField;
     cdsCommands_MAX_NO: TAggregateField;
     cdsProjectCommands: TClientDataSet;
+    grdProjectCommands: TDBGrid;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure grdProjectCommandsCellClick(Column: TColumnEh);
     procedure actShowMoreExecute(Sender: TObject);
     procedure aeAppEventsDeactivate(Sender: TObject);
     procedure actConfigExecute(Sender: TObject);
-    procedure grdProjectCommandsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumnEh;
-      State: TGridDrawState);
     procedure cdsProjectsNewRecord(DataSet: TDataSet);
     procedure cdsCommandsNewRecord(DataSet: TDataSet);
+    procedure grdProjectCommandsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure grdProjectCommandsCellClick(Column: TColumn);
+    procedure grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+      State: TGridDrawState);
   private
     FTortoiseProcFileName: string;
     FIsNearMousePosition: Boolean;
@@ -60,6 +60,7 @@ type
     function GetDefaultTortoiseProcFileName(const ATortoiseProcFileName: string): string;
     procedure RecalcFormDimensionsAndPosition;
     function ConfigurationRegKey: string;
+    procedure HideGridScrollBar;
   public
     { Public declarations }
   end;
@@ -81,10 +82,12 @@ const
   EnvVarProgramFilesX86 = 'ProgramFiles(x86)';
   CommandPrefix = 'CMD_';
   ProjectPathMacro = '%ProjectDir%';
-  ProjectsGridRowHeight = 25;
+  ProjectsGridRowHeight = 23;
   ProjectNameColumnWidth = 200;
   CommandColumnWidth = 80;
   NearMousePositionTolerancePixelCount = 30;
+  OddRowColor = clCream;
+  EvenRowColor = 15137255;
 
 {$R *.dfm}
 
@@ -269,12 +272,11 @@ procedure TfmMain.RefreshGridColumns;
 
   procedure AddColumn(const AFieldName: string; AWidth: Integer; AIsCommandColumn: Boolean);
   var
-    col: TColumnEh;
+    col: TColumn;
   begin
     col:= grdProjectCommands.Columns.Add;
     col.FieldName:= AFieldName;
     col.Width:= AWidth;
-    col.Font.Size:= 11;
     if AIsCommandColumn then
       begin
         col.Alignment:= taCenter;
@@ -294,6 +296,11 @@ begin
       AddColumn(CommandPrefix + cdsCommandsCOMMAND_NO.AsString, CommandColumnWidth, True);
       cdsCommands.Next;
     end;
+end;
+
+procedure TfmMain.HideGridScrollBar;
+begin
+  ShowScrollBar(grdProjectCommands.Handle, SB_VERT, False);
 end;
 
 procedure TfmMain.RefreshProjectCommands;
@@ -353,8 +360,6 @@ begin
   if cdsProjects.IsEmpty then
     actConfig.Execute;
 
-  grdProjectCommands.RowHeight:= ProjectsGridRowHeight;
-
   FSavedMousePos:= Mouse.CursorPos;
   FIsNearMousePosition:=
     IsTaskBarAtBottom and
@@ -412,7 +417,7 @@ begin
   end;
 end;
 
-procedure TfmMain.grdProjectCommandsCellClick(Column: TColumnEh);
+procedure TfmMain.grdProjectCommandsCellClick(Column: TColumn);
 var
   Arguments: string;
 begin
@@ -504,8 +509,12 @@ begin
 end;
 
 procedure TfmMain.grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;
-  Column: TColumnEh; State: TGridDrawState);
+  Column: TColumn; State: TGridDrawState);
+var
+  RecNo: Integer;
 begin
+  RecNo:= grdProjectCommands.DataSource.DataSet.RecNo;
+  grdProjectCommands.Canvas.Brush.Color:= IfThen(Odd(RecNo), OddRowColor, EvenRowColor);
   grdProjectCommands.DefaultDrawColumnCell(Rect, DataCol, Column, []);
 end;
 
@@ -514,6 +523,7 @@ begin
   SetFormHeight;
   SetFormWidth;
   SetFormPosition;
+  HideGridScrollBar;
 end;
 
 end.
