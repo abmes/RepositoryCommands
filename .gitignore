@@ -1,0 +1,8 @@
+bin
+__history
+*.~dsk
+*.local
+*.dsk
+*.identcache
+*.res
+*.vlb
