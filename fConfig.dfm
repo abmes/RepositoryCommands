@@ -24,7 +24,7 @@ object fmConfig: TfmConfig
     Height = 36
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 0
+    TabOrder = 3
     DesignSize = (
       746
       36)
@@ -36,7 +36,7 @@ object fmConfig: TfmConfig
       Anchors = [akTop, akRight]
       Kind = bkCancel
       NumGlyphs = 2
-      TabOrder = 0
+      TabOrder = 1
     end
     object btnOk: TBitBtn
       Left = 568
@@ -46,7 +46,7 @@ object fmConfig: TfmConfig
       Anchors = [akTop, akRight]
       Kind = bkOK
       NumGlyphs = 2
-      TabOrder = 1
+      TabOrder = 0
     end
   end
   object gbTortoiseProcFileName: TGroupBox
@@ -55,7 +55,7 @@ object fmConfig: TfmConfig
     Width = 729
     Height = 57
     Caption = ' TortoiseProc Executable '
-    TabOrder = 1
+    TabOrder = 0
     object edtTortoiseProcFileName: TEdit
       Left = 16
       Top = 24
@@ -87,7 +87,7 @@ object fmConfig: TfmConfig
     Width = 729
     Height = 225
     Caption = ' Projects '
-    TabOrder = 2
+    TabOrder = 1
     object btnMoveProjectUp: TSpeedButton
       Left = 700
       Top = 103
@@ -164,7 +164,7 @@ object fmConfig: TfmConfig
     Width = 729
     Height = 171
     Caption = ' Commands '
-    TabOrder = 3
+    TabOrder = 2
     object btnMoveCommandDown: TSpeedButton
       Left = 700
       Top = 111
