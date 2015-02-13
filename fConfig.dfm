@@ -1,7 +1,7 @@
 object fmConfig: TfmConfig
   Left = 0
   Top = 0
-  BorderIcons = [biSystemMenu, biMinimize]
+  BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Configuration'
   ClientHeight = 535
