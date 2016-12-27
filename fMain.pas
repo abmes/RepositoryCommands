@@ -420,6 +420,10 @@ end;
 procedure TfmMain.grdProjectCommandsCellClick(Column: TColumn);
 var
   Arguments: string;
+  ArgumentTokens: TStringList;
+  ExeFileName: string;
+  NewExeFileName: string;
+  ExeFileNameFromPath: string;
 begin
   if (Column.FieldName = 'PROJECT_NAME') then
     OpenDirectoryAndHalt(cdsProjectCommands.FieldByName('PROJECT_DIR').AsString);
@@ -436,7 +440,37 @@ begin
       cdsProjectCommands.FieldByName('PROJECT_DIR').AsString,
       [rfReplaceAll]);
 
-  ExecCommandAndHalt(FTortoiseProcFileName, Arguments);
+  ExeFileName:= FTortoiseProcFileName;
+
+  ArgumentTokens:= TStringList.Create;
+  try
+    ExtractStrings([' '], [], PChar(Arguments), ArgumentTokens);
+
+    if (ArgumentTokens.Count > 0) then
+      begin
+        NewExeFileName:= AnsiDequotedStr(ArgumentTokens[0], '"');
+
+        if SameText(ExtractFileExt(NewExeFileName), '.exe') then
+          begin
+            if (ExtractFilePath(NewExeFileName) = '') then
+              begin
+                ExeFileNameFromPath:= FileFromPath(NewExeFileName);
+                if (ExeFileNameFromPath <> '') then
+                  NewExeFileName:= ExeFileNameFromPath;
+              end;
+
+            ExeFileName:= NewExeFileName;
+            ArgumentTokens.Delete(0);
+            ArgumentTokens.Delimiter:= ' ';
+            ArgumentTokens.QuoteChar:= ' ';
+            Arguments:= ArgumentTokens.DelimitedText;
+          end;
+      end;
+  finally
+    ArgumentTokens.Free;
+  end;
+
+  ExecCommandAndHalt(ExeFileName, Arguments, cdsProjectCommands.FieldByName('PROJECT_DIR').AsString);
 end;
 
 procedure TfmMain.grdProjectCommandsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);

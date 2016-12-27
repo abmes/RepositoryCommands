@@ -2,7 +2,7 @@ unit uUtils;
 
 interface
 
-procedure ExecCommandAndHalt(const AExeFileName, AArguments: string);
+procedure ExecCommandAndHalt(const AExeFileName, AArguments, AWorkingDir: string);
 procedure OpenDirectoryAndHalt(const ADirectory: string);
 function GetLastToken(const AStr: string; ADelimiter: Char): string;
 function VarToInt(const AValue: Variant): Integer;
@@ -11,6 +11,7 @@ function IsTaskBarAtBottom: Boolean;
 function RepositoryTypeName: string;
 function RepositoryTypeSubDirName: string;
 function DefaultTortoiseProcFileName: string;
+function FileFromPath(const AFileName: string): string;
 
 const
   RepositoryTypeNameSVN = 'svn';
@@ -55,7 +56,7 @@ begin
   raise Exception.Create('Unknown repository type');
 end;
 
-procedure ExecCommandAndHalt(const AExeFileName, AArguments: string);
+procedure ExecCommandAndHalt(const AExeFileName, AArguments, AWorkingDir: string);
 var
   UnquotedExeFileName: string;
 begin
@@ -64,7 +65,7 @@ begin
   if not FileExists(UnquotedExeFileName) then
     raise Exception.CreateFmt('File %s does not exist!', [AExeFileName]);
 
-  ShellExec(0, 'open', AExeFileName, AArguments, '', 0);
+  ShellExec(0, 'open', AExeFileName, AArguments, AWorkingDir, SW_SHOWNORMAL);
   Halt(0);
 end;
 
@@ -115,6 +116,20 @@ var
 begin
   TaskBarRect:= GetTaskBarRect;
   Result:= (TaskBarRect.Top > 0);
+end;
+
+function FileFromPath(const AFileName: string): string;
+var
+  a: PChar;
+  len: Integer;
+begin
+  SetLength(Result, 1024 * 8);
+  a:= nil;
+  len:= SearchPath(nil, PChar(AFileName), nil, Length(Result), PChar(Result), a);
+  if (len > 0) then
+    Result:= LeftStr(Result, len)
+  else
+    Result:= '';
 end;
 
 end.
