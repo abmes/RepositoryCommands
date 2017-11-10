@@ -7,7 +7,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, DB, StdCtrls, Buttons, ExtCtrls, DBCtrls,
   ActnList, ColorNavigator, ImgList, Mask,
-  System.Actions, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls, Vcl.ToolWin;
+  System.Actions, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls, Vcl.ToolWin,
+  System.ImageList;
 
 type
   TMoveDirection = (mdUp, mdDown);
@@ -81,7 +82,8 @@ end;
 
 procedure TfmConfig.CheckProjectType(const APath: string);
 begin
-  if (Length(TDirectory.GetDirectories(APath, RepositoryTypeSubDirName)) = 0) then
+  if (Length(TDirectory.GetDirectories(APath, RepositoryTypeSubDirName)) = 0) and
+     (Length(TDirectory.GetFiles(APath, RepositoryTypeSubDirName)) = 0) then
     raise Exception.Create('Unknown Repository type!');
 end;
 
