@@ -424,6 +424,7 @@ var
   ExeFileName: string;
   NewExeFileName: string;
   ExeFileNameFromPath: string;
+  token: string;
 begin
   if (Column.FieldName = 'PROJECT_NAME') then
     OpenDirectoryAndHalt(cdsProjectCommands.FieldByName('PROJECT_DIR').AsString);
@@ -461,9 +462,11 @@ begin
 
             ExeFileName:= NewExeFileName;
             ArgumentTokens.Delete(0);
-            ArgumentTokens.Delimiter:= ' ';
-            ArgumentTokens.QuoteChar:= ' ';
-            Arguments:= ArgumentTokens.DelimitedText;
+
+            Arguments:= '';
+            for token in ArgumentTokens do
+              Arguments:= Arguments + token + ' ';
+            Arguments:= Trim(Arguments);
           end;
       end;
   finally
