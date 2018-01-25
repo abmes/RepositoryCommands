@@ -139,6 +139,9 @@ procedure TfmMain.LoadConfig;
 
 var
   Reg: TRegistry;
+  ArgumentsSaveSize: Integer;
+  RecordsData: Variant;
+  MS: TMemoryStream;
 begin
   Reg:= TRegistry.Create;
   try
@@ -147,7 +150,25 @@ begin
       try
         FTortoiseProcFileName:= Reg.ReadString(RegValueTortoiseProcFileName);
         LoadDataSet(cdsProjects, Reg, RegValueProjects);
+
+        ArgumentsSaveSize:= cdsCommandsCOMMAND_ARGUMENTS.Size;
+
         LoadDataSet(cdsCommands, Reg, RegValueCommands);
+
+        if (cdsCommandsCOMMAND_ARGUMENTS.Size <> ArgumentsSaveSize) then
+          begin
+            MS:= TMemoryStream.Create;
+            try
+              cdsCommands.SaveToStream(MS, dfXMLUTF8);
+              cdsCommands.Close;
+              cdsCommands.FieldDefs.Find('COMMAND_ARGUMENTS').Size:= ArgumentsSaveSize;
+              cdsCommandsCOMMAND_ARGUMENTS.Size:= ArgumentsSaveSize;
+              cdsCommands.CreateDataSet;
+              cdsCommands.LoadFromStream(MS);
+            finally
+              MS.Free;
+            end;
+          end;
       finally
         Reg.CloseKey;
       end;
@@ -234,7 +255,7 @@ begin
   cdsCommands.First;
   while not cdsCommands.Eof do
     begin
-      AddFieldDef(CommandPrefix + cdsCommandsCOMMAND_NO.AsString, ftWideString, 250);
+      AddFieldDef(CommandPrefix + cdsCommandsCOMMAND_NO.AsString, ftWideString, 2000);
       cdsCommands.Next;
     end;
 

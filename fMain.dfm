@@ -175,7 +175,7 @@ object fmMain: TfmMain
       DisplayLabel = 'Arguments'
       FieldName = 'COMMAND_ARGUMENTS'
       Required = True
-      Size = 250
+      Size = 2000
     end
     object cdsCommandsIS_FAVORITE: TBooleanField
       Alignment = taCenter
