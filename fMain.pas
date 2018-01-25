@@ -140,7 +140,6 @@ procedure TfmMain.LoadConfig;
 var
   Reg: TRegistry;
   ArgumentsSaveSize: Integer;
-  RecordsData: Variant;
   MS: TMemoryStream;
 begin
   Reg:= TRegistry.Create;
