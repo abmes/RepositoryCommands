@@ -44,6 +44,7 @@ type
     tlbSelectTortoiseProc: TToolBar;
     btnSelectTortoiseProc: TToolButton;
     actSelectTortoiseProc: TAction;
+    btnIndent: TSpeedButton;
     procedure actAddProjectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actMoveProjectUpExecute(Sender: TObject);
@@ -55,6 +56,7 @@ type
     procedure grdCommandsDblClick(Sender: TObject);
     procedure grdCommandsCellClick(Column: TColumn);
     procedure actSelectTortoiseProcExecute(Sender: TObject);
+    procedure btnIndentClick(Sender: TObject);
   private
     function GetTortoiseProcFileName: string;
     procedure SetTortoiseProcFileName(const Value: string);
@@ -209,6 +211,38 @@ begin
 
   if odTortoiseProcFileName.Execute() then
     edtTortoiseProcFileName.Text:= Format('"%s"', [odTortoiseProcFileName.FileName]);
+end;
+
+procedure TfmConfig.btnIndentClick(Sender: TObject);
+var
+  ProjectName: string;
+begin
+  if not dsProjects.DataSet.IsEmpty then
+    begin
+      ProjectName:= dsProjects.DataSet.FieldByName('PROJECT_NAME').AsString;
+
+      if (Length(ProjectName) - Length(Trim(ProjectName)) > 20) then
+        ProjectName:= Trim(ProjectName)
+      else
+        ProjectName:= '  ' + ProjectName;
+
+      dsProjects.DataSet.CheckBrowseMode;
+
+      dsProjects.DataSet.DisableControls;
+      try
+        dsProjects.DataSet.Edit;
+        try
+          dsProjects.DataSet.FieldByName('PROJECT_NAME').AsString:= ProjectName;
+          dsProjects.DataSet.Post;
+        except
+          dsProjects.DataSet.Cancel;
+          raise;
+        end;
+      finally
+        dsProjects.DataSet.EnableControls;
+      end;
+
+    end;
 end;
 
 procedure TfmConfig.MoveRecord(ADataSet: TDataSet; const ANoFieldName: string; AMoveDirection: TMoveDirection);

@@ -408,7 +408,7 @@ begin
         if cdsProjectsIS_FAVORITE.AsBoolean then
           begin
             Category:= JumpLists.Categories.Add;
-            Category.Title:= cdsProjectsPROJECT_NAME.AsString;
+            Category.Title:= Trim(cdsProjectsPROJECT_NAME.AsString);
 
             cdsCommands.First;
             while not cdsCommands.eof do
