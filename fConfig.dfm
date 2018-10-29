@@ -103,7 +103,7 @@ object fmConfig: TfmConfig
       Action = actMoveProjectDown
     end
     object btnIndent: TSpeedButton
-      Left = 72
+      Left = 91
       Top = 22
       Width = 25
       Height = 25
@@ -129,10 +129,10 @@ object fmConfig: TfmConfig
     object navProjects: TDBColorNavigator
       Left = 16
       Top = 22
-      Width = 56
+      Width = 75
       Height = 25
       DataSource = dsProjects
-      VisibleButtons = [nbInsert, nbDelete]
+      VisibleButtons = [nbInsert, nbDelete, nbEdit]
       TabOrder = 0
       BeforeAction = navProjectsBeforeAction
     end

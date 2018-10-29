@@ -64,6 +64,7 @@ type
     function GetProjectName(const APath: string): string;
     procedure CheckProjectType(const APath: string);
     procedure NegateBooleanField(ADataSet: TDataSet; const AFieldName: string);
+    procedure AddOrEditProject(const AAdd: Boolean);
   public
     property TortoiseProcFileName: string read GetTortoiseProcFileName write SetTortoiseProcFileName;
   end;
@@ -90,12 +91,20 @@ begin
 end;
 
 procedure TfmConfig.actAddProjectExecute(Sender: TObject);
+begin
+  AddOrEditProject(True);
+end;
+
+procedure TfmConfig.AddOrEditProject(const AAdd: Boolean);
 var
   ProjectDir: string;
 begin
   if SelectDirectory('Project Dir', '', ProjectDir) then
     begin
-      dsProjects.DataSet.Append;
+      if AAdd then
+        dsProjects.DataSet.Append
+      else
+        dsProjects.DataSet.Edit;
       try
         CheckProjectType(ProjectDir);
         dsProjects.DataSet.FieldByName('PROJECT_DIR').AsString:= ProjectDir;
@@ -303,6 +312,12 @@ begin
   if (Button = nbInsert) then
     begin
       actAddProject.Execute;
+      Abort;
+    end;
+
+  if (Button = nbEdit) then
+    begin
+      AddOrEditProject(False);
       Abort;
     end;
 end;
