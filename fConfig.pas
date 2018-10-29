@@ -45,6 +45,7 @@ type
     btnSelectTortoiseProc: TToolButton;
     actSelectTortoiseProc: TAction;
     btnIndent: TSpeedButton;
+    actEditProject: TAction;
     procedure actAddProjectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actMoveProjectUpExecute(Sender: TObject);
@@ -57,6 +58,7 @@ type
     procedure grdCommandsCellClick(Column: TColumn);
     procedure actSelectTortoiseProcExecute(Sender: TObject);
     procedure btnIndentClick(Sender: TObject);
+    procedure actEditProjectExecute(Sender: TObject);
   private
     function GetTortoiseProcFileName: string;
     procedure SetTortoiseProcFileName(const Value: string);
@@ -96,9 +98,31 @@ begin
 end;
 
 procedure TfmConfig.AddOrEditProject(const AAdd: Boolean);
+
+  function GetIndent(const s: string): string;
+  var
+    IndentLength: Integer;
+  begin
+    IndentLength:= Length(s) - Length(TrimLeft(s));
+
+    if (s = '') or (IndentLength = 0) then
+      Result:= ''
+    else
+      Result:= Copy(s, 1, IndentLength);
+  end;
+
 var
   ProjectDir: string;
 begin
+  if AAdd then
+    ProjectDir:= ''
+  else
+    begin
+      ProjectDir:= Trim(dsProjects.DataSet.FieldByName('PROJECT_DIR').AsString);
+      while (ProjectDir <> '') and not TDirectory.Exists(ProjectDir) do
+        ProjectDir:= TDirectory.GetParent(ProjectDir);
+    end;
+
   if SelectDirectory('Project Dir', '', ProjectDir) then
     begin
       if AAdd then
@@ -107,8 +131,10 @@ begin
         dsProjects.DataSet.Edit;
       try
         CheckProjectType(ProjectDir);
+
         dsProjects.DataSet.FieldByName('PROJECT_DIR').AsString:= ProjectDir;
-        dsProjects.DataSet.FieldByName('PROJECT_NAME').AsString:= GetProjectName(ProjectDir);
+        dsProjects.DataSet.FieldByName('PROJECT_NAME').AsString:=
+          GetIndent(dsProjects.DataSet.FieldByName('PROJECT_NAME').AsString) + GetProjectName(ProjectDir);
         dsProjects.DataSet.Post;
       except
         dsProjects.DataSet.Cancel;
@@ -151,12 +177,16 @@ end;
 
 procedure TfmConfig.grdProjectsDblClick(Sender: TObject);
 begin
-  NegateBooleanField(dsProjects.DataSet, 'IS_FAVORITE');
+  if (grdProjects.SelectedIndex = 2) then
+    NegateBooleanField(dsProjects.DataSet, 'IS_FAVORITE')
+  else
+    actEditProject.Execute;
 end;
 
 procedure TfmConfig.grdCommandsDblClick(Sender: TObject);
 begin
-  NegateBooleanField(dsCommands.DataSet, 'IS_FAVORITE');
+  if (grdCommands.SelectedIndex = 2) then
+    NegateBooleanField(dsCommands.DataSet, 'IS_FAVORITE');
 end;
 
 procedure TfmConfig.grdCommandsCellClick(Column: TColumn);
@@ -185,6 +215,11 @@ begin
       dsProjects.DataSet.CheckBrowseMode;
       dsCommands.DataSet.CheckBrowseMode;
     end;
+end;
+
+procedure TfmConfig.actEditProjectExecute(Sender: TObject);
+begin
+  AddOrEditProject(False);
 end;
 
 procedure TfmConfig.actMoveCommandDownExecute(Sender: TObject);
@@ -317,7 +352,7 @@ begin
 
   if (Button = nbEdit) then
     begin
-      AddOrEditProject(False);
+      actEditProject.Execute;
       Abort;
     end;
 end;

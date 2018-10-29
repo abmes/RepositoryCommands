@@ -142,7 +142,7 @@ object fmConfig: TfmConfig
       Width = 681
       Height = 165
       DataSource = dsProjects
-      Options = [dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit]
+      Options = [dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
       TabOrder = 1
       TitleFont.Charset = DEFAULT_CHARSET
       TitleFont.Color = clWindowText
@@ -278,6 +278,9 @@ object fmConfig: TfmConfig
     object actAddProject: TAction
       Hint = 'Choose Project Dir'
       OnExecute = actAddProjectExecute
+    end
+    object actEditProject: TAction
+      OnExecute = actEditProjectExecute
     end
     object actMoveProjectUp: TAction
       Hint = 'Move Up'
