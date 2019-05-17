@@ -336,16 +336,24 @@ procedure TfmMain.RefreshGridColumns;
   end;
 
 begin
-  grdProjectCommands.Columns.Clear;
+  grdProjectCommands.Columns.BeginUpdate;
+  try
+    grdProjectCommands.Columns.Clear;
 
-  AddColumn('PROJECT_NAME', ProjectNameColumnWidth, False);
+    AddColumn('PROJECT_NAME', ProjectNameColumnWidth, False);
 
-  cdsCommands.First;
-  while not cdsCommands.Eof do
-    begin
-      AddColumn(CommandPrefix + cdsCommandsCOMMAND_NO.AsString, CommandColumnWidth, True);
-      cdsCommands.Next;
-    end;
+    cdsCommands.First;
+    while not cdsCommands.Eof do
+      begin
+        if cdsCommandsIS_FAVORITE.AsBoolean or not pnlShowMore.Visible then
+          AddColumn(CommandPrefix + cdsCommandsCOMMAND_NO.AsString, CommandColumnWidth, True);
+        cdsCommands.Next;
+      end;
+
+    HideGridScrollBar;
+  finally
+    grdProjectCommands.Columns.EndUpdate;
+  end;
 end;
 
 procedure TfmMain.HideGridScrollBar;
@@ -375,11 +383,22 @@ begin
 end;
 
 procedure TfmMain.SetFormWidth;
+var
+  CommandCount: Integer;
 begin
+  CommandCount:= 0;
+  cdsCommands.First;
+  while not cdsCommands.Eof do
+    begin
+      if cdsCommandsIS_FAVORITE.AsBoolean or not pnlShowMore.Visible then
+        Inc(CommandCount);
+      cdsCommands.Next;
+    end;
+
   ClientWidth:=
     4 + // bevel
     ProjectNameColumnWidth +
-    cdsCommands.RecordCount * CommandColumnWidth;
+    CommandCount * CommandColumnWidth;
 end;
 
 procedure TfmMain.SetFormPosition;
@@ -541,6 +560,7 @@ begin
   pnlShowMore.Visible:= False;
   pnlConfig.Visible:= True;
   RecalcFormDimensionsAndPosition;
+  RefreshGridColumns;
 end;
 
 procedure TfmMain.actConfigExecute(Sender: TObject);
