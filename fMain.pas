@@ -61,6 +61,8 @@ type
     procedure RecalcFormDimensionsAndPosition;
     function ConfigurationRegKey: string;
     procedure HideGridScrollBar;
+    function GetOrganizationName(ASourceDataSet: TDataSet): string;
+    function ResolveMacros(const AValue: string; ASourceDataSet: TDataSet): string;
   public
     { Public declarations }
   end;
@@ -71,7 +73,7 @@ var
 implementation
 
 uses
-  dwJumpLists, Registry, Math, fConfig, JclStrings, uUtils, StrUtils;
+  dwJumpLists, Registry, Math, fConfig, JclStrings, uUtils, StrUtils, System.Types;
 
 const
   RegValueTortoiseProcFileName = 'TortoiseProcFileName';
@@ -82,6 +84,8 @@ const
   EnvVarProgramFilesX86 = 'ProgramFiles(x86)';
   CommandPrefix = 'CMD_';
   ProjectPathMacro = '%ProjectDir%';
+  ProjectNameMacro = '%ProjectName%';
+  OrganizationNameMacro = '%OrganizationName%';
   ProjectsGridRowHeight = 23;
   ProjectNameColumnWidth = 200;
   CommandColumnWidth = 80;
@@ -113,6 +117,21 @@ begin
 
   if FileExists(GetFullTortoiseProcFileName(EnvVarProgramFilesX86)) then
     Exit(StrDoubleQuote(GetFullTortoiseProcFileName(EnvVarProgramFilesX86)));
+end;
+
+function TfmMain.GetOrganizationName(ASourceDataSet: TDataSet): string;
+var
+  ProjectDirParts: TStringDynArray;
+begin
+  if (Pos('.', cdsProjectsPROJECT_NAME.AsString) > 0) then
+    Exit(SplitString(cdsProjectCommands.FieldByName('PROJECT_NAME').AsString, '.')[0]);
+
+  ProjectDirParts:= SplitString(cdsProjectCommands.FieldByName('PROJECT_DIR').AsString, '\');
+
+  if (Length(ProjectDirParts) < 3) then
+    raise Exception.Create('Cannot resolve OrganizationName from ProjectDir');
+
+  Result:= ProjectDirParts[Length(ProjectDirParts)-2];
 end;
 
 procedure TfmMain.LoadConfig;
@@ -288,6 +307,17 @@ begin
   cdsProjectCommands.First;
 end;
 
+function TfmMain.ResolveMacros(const AValue: string; ASourceDataSet: TDataSet): string;
+begin
+  Result:= AValue;
+
+  Result:= StringReplace(Result, ProjectPathMacro, ASourceDataSet.FieldByName('PROJECT_DIR').AsString, [rfReplaceAll]);
+  Result:= StringReplace(Result, ProjectNameMacro, ASourceDataSet.FieldByName('PROJECT_NAME').AsString, [rfReplaceAll]);
+
+  if (Pos(OrganizationNameMacro, Result) > 0) then
+    Result:= StringReplace(Result, OrganizationNameMacro, GetOrganizationName(ASourceDataSet), [rfReplaceAll]);
+end;
+
 procedure TfmMain.RefreshGridColumns;
 
   procedure AddColumn(const AFieldName: string; AWidth: Integer; AIsCommandColumn: Boolean);
@@ -421,7 +451,7 @@ begin
                     Task.ShellLink.Arguments:=
                       Format('%s "%s"', [
                         FTortoiseProcFileName,
-                        StringReplace(cdsCommandsCOMMAND_ARGUMENTS.AsString, ProjectPathMacro, cdsProjectsPROJECT_DIR.AsString, [rfReplaceAll])]);
+                        ResolveMacros(cdsCommandsCOMMAND_ARGUMENTS.AsString, cdsProjects)]);
                   end;
 
                 cdsCommands.Next
@@ -454,12 +484,7 @@ begin
   if not cdsCommands.Locate('COMMAND_NO', StrToInt(GetLastToken(Column.FieldName, '_')), []) then
     raise Exception.Create('Internal error: Command not found');
 
-  Arguments:=
-    StringReplace(
-      cdsCommandsCOMMAND_ARGUMENTS.AsString,
-      ProjectPathMacro,
-      cdsProjectCommands.FieldByName('PROJECT_DIR').AsString,
-      [rfReplaceAll]);
+  Arguments:= ResolveMacros(cdsCommandsCOMMAND_ARGUMENTS.AsString, cdsProjectCommands);
 
   ExeFileName:= FTortoiseProcFileName;
 
