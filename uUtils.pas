@@ -12,6 +12,7 @@ function RepositoryTypeName: string;
 function RepositoryTypeSubDirName: string;
 function DefaultTortoiseProcFileName: string;
 function FileFromPath(const AFileName: string): string;
+function ControlIsPressed: Boolean;
 
 const
   RepositoryTypeNameSVN = 'svn';
@@ -130,6 +131,11 @@ begin
     Result:= LeftStr(Result, len)
   else
     Result:= '';
+end;
+
+function ControlIsPressed: Boolean;
+begin
+  Result:= GetKeyState(VK_CONTROL) and (1 shl 15) <> 0;
 end;
 
 end.

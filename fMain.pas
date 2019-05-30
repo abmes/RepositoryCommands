@@ -44,6 +44,7 @@ type
     procedure grdProjectCommandsCellClick(Column: TColumn);
     procedure grdProjectCommandsDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState);
+    procedure aeAppEventsMessage(var Msg: tagMSG; var Handled: Boolean);
   private
     FTortoiseProcFileName: string;
     FIsNearMousePosition: Boolean;
@@ -56,6 +57,7 @@ type
     procedure RefreshProjectCommandsDataSet;
     procedure SetFormHeight;
     procedure SetFormPosition;
+    function GetVisibleCommandCount: Integer;
     procedure SetFormWidth;
     function GetDefaultTortoiseProcFileName(const ATortoiseProcFileName: string): string;
     procedure RecalcFormDimensionsAndPosition;
@@ -73,7 +75,7 @@ var
 implementation
 
 uses
-  dwJumpLists, Registry, Math, fConfig, JclStrings, uUtils, StrUtils, System.Types;
+  dwJumpLists, Registry, Math, fConfig, JclStrings, uUtils, StrUtils, System.Types, System.IOUtils;
 
 const
   RegValueTortoiseProcFileName = 'TortoiseProcFileName';
@@ -132,6 +134,19 @@ begin
     raise Exception.Create('Cannot resolve OrganizationName from ProjectDir');
 
   Result:= ProjectDirParts[Length(ProjectDirParts)-2];
+end;
+
+function TfmMain.GetVisibleCommandCount: Integer;
+begin
+  Result:= 0;
+
+  cdsCommands.First;
+  while not cdsCommands.Eof do
+    begin
+      if cdsCommandsIS_FAVORITE.AsBoolean or not pnlShowMore.Visible then
+        Inc(Result);
+      cdsCommands.Next;
+    end;
 end;
 
 procedure TfmMain.LoadConfig;
@@ -383,29 +398,18 @@ begin
 end;
 
 procedure TfmMain.SetFormWidth;
-var
-  CommandCount: Integer;
 begin
-  CommandCount:= 0;
-  cdsCommands.First;
-  while not cdsCommands.Eof do
-    begin
-      if cdsCommandsIS_FAVORITE.AsBoolean or not pnlShowMore.Visible then
-        Inc(CommandCount);
-      cdsCommands.Next;
-    end;
-
   ClientWidth:=
     4 + // bevel
     ProjectNameColumnWidth +
-    CommandCount * CommandColumnWidth;
+    GetVisibleCommandCount * CommandColumnWidth;
 end;
 
 procedure TfmMain.SetFormPosition;
 
   function CalcLeft: Integer;
   begin
-    Result:= FSavedMousePos.X - ProjectNameColumnWidth - ((cdsCommands.RecordCount * CommandColumnWidth) div 2);
+    Result:= FSavedMousePos.X - ProjectNameColumnWidth - ((GetVisibleCommandCount * CommandColumnWidth) div 2);
     Result:= Max(Result, 0);
     Result:= Min(Result, Screen.Width - Width);
   end;
@@ -552,6 +556,24 @@ procedure TfmMain.aeAppEventsDeactivate(Sender: TObject);
 begin
   if (Screen.ActiveForm = Self) then
     Close;
+end;
+
+procedure TfmMain.aeAppEventsMessage(var Msg: tagMSG; var Handled: Boolean);
+var
+  p: TPoint;
+  Command: string;
+begin
+  if ((Msg.message = WM_RBUTTONDOWN) or ((Msg.message = WM_LBUTTONDOWN) and ControlIsPressed)) and
+     grdProjectCommands.MouseInClient then
+    begin
+      p:= grdProjectCommands.ScreenToClient(Mouse.CursorPos);
+
+      if (grdProjectCommands.MouseCoord(p.X, p.Y).X = 0) then
+        begin
+          Command:= TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'PowerShellLauncher.exe');
+          ExecCommandAndHalt(Command, '', cdsProjectCommands.FieldByName('PROJECT_DIR').AsString)
+        end;
+    end;
 end;
 
 procedure TfmMain.actShowMoreExecute(Sender: TObject);

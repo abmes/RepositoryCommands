@@ -113,6 +113,7 @@ object fmMain: TfmMain
   end
   object aeAppEvents: TApplicationEvents
     OnDeactivate = aeAppEventsDeactivate
+    OnMessage = aeAppEventsMessage
     Left = 64
   end
   object cdsProjects: TClientDataSet
