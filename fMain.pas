@@ -562,14 +562,17 @@ procedure TfmMain.aeAppEventsMessage(var Msg: tagMSG; var Handled: Boolean);
 var
   p: TPoint;
   Command: string;
+  GridCoord: TGridCoord;
 begin
   if ((Msg.message = WM_RBUTTONDOWN) or ((Msg.message = WM_LBUTTONDOWN) and ControlIsPressed)) and
      grdProjectCommands.MouseInClient then
     begin
       p:= grdProjectCommands.ScreenToClient(Mouse.CursorPos);
+      GridCoord:= grdProjectCommands.MouseCoord(p.X, p.Y);
 
-      if (grdProjectCommands.MouseCoord(p.X, p.Y).X = 0) then
+      if (GridCoord.X = 0) then
         begin
+          cdsProjectCommands.RecNo:= GridCoord.Y + 1;
           Command:= TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'PowerShellLauncher.exe');
           ExecCommandAndHalt(Command, '', cdsProjectCommands.FieldByName('PROJECT_DIR').AsString)
         end;
