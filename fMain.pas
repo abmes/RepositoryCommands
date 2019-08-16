@@ -564,7 +564,9 @@ var
   Command: string;
   GridCoord: TGridCoord;
 begin
-  if ((Msg.message = WM_RBUTTONDOWN) or ((Msg.message = WM_LBUTTONDOWN) and ControlIsPressed)) and
+  if ((Msg.message = WM_MBUTTONDOWN) or
+      (Msg.message = WM_RBUTTONDOWN) or
+      ((Msg.message = WM_LBUTTONDOWN) and ControlIsPressed)) and
      grdProjectCommands.MouseInClient then
     begin
       p:= grdProjectCommands.ScreenToClient(Mouse.CursorPos);
@@ -573,8 +575,16 @@ begin
       if (GridCoord.X = 0) then
         begin
           cdsProjectCommands.RecNo:= GridCoord.Y + 1;
-          Command:= TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'PowerShellLauncher.exe');
-          ExecCommandAndHalt(Command, '', cdsProjectCommands.FieldByName('PROJECT_DIR').AsString)
+
+          if (Msg.message = WM_MBUTTONDOWN) then
+            begin
+              OpenDefaultDocumentAndHalt(cdsProjectCommands.FieldByName('PROJECT_DIR').AsString);
+            end
+          else
+            begin
+              Command:= TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'PowerShellLauncher.exe');
+              ExecCommandAndHalt(Command, '', cdsProjectCommands.FieldByName('PROJECT_DIR').AsString);
+            end;
         end;
     end;
 end;

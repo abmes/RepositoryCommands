@@ -2,8 +2,12 @@ unit uUtils;
 
 interface
 
+uses
+  System.IOUtils, Vcl.Dialogs;
+
 procedure ExecCommandAndHalt(const AExeFileName, AArguments, AWorkingDir: string);
 procedure OpenDirectoryAndHalt(const ADirectory: string);
+procedure OpenDefaultDocumentAndHalt(const ADirectory: string);
 function GetLastToken(const AStr: string; ADelimiter: Char): string;
 function VarToInt(const AValue: Variant): Integer;
 function GetTaskBarHeight: Integer;
@@ -21,7 +25,8 @@ const
 implementation
 
 uses
-  JclShell, SysUtils, JclStrings, StrUtils, Variants, Windows, Classes;
+  JclShell, SysUtils, JclStrings, StrUtils, Variants, Windows, Classes,
+  System.Types;
 
 function RepositoryTypeName: string;
 var
@@ -77,6 +82,40 @@ begin
 
   ShellExec(0, 'open', ADirectory, '', '', SW_SHOWNORMAL);
   Halt(0);
+end;
+
+procedure OpenDocumentAndHalt(const AFileName: string);
+begin
+  if not FileExists(AFileName) then
+    raise Exception.CreateFmt('File %s does not exist!', [AFileName]);
+
+  ShellExec(0, 'open', AFileName, '', '', SW_SHOWNORMAL);
+  Halt(0);
+end;
+
+procedure OpenDefaultDocumentAndHalt(const ADirectory: string);
+const
+  SearchPatterns: array[1..5] of string = ('*.sln', '*.groupproj', '*.csproj', '*.dproj', '*.txt');
+var
+  SearchPattern: string;
+  Files: TStringDynArray;
+begin
+  for SearchPattern in SearchPatterns do
+    begin
+      Files:= TDirectory.GetFiles(ADirectory, SearchPattern, TSearchOption.soTopDirectoryOnly);
+
+      if (Length(Files) > 0) then
+        OpenDocumentAndHalt(Files[0])
+      else
+        begin
+          Files:= TDirectory.GetFiles(ADirectory, SearchPattern, TSearchOption.soAllDirectories);
+
+          if (Length(Files) > 0) then
+            OpenDocumentAndHalt(Files[0]);
+        end;
+    end;
+
+  ShowMessage('No default document found!');
 end;
 
 function GetLastToken(const AStr: string; ADelimiter: Char): string;
