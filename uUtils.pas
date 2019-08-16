@@ -105,14 +105,15 @@ begin
       Files:= TDirectory.GetFiles(ADirectory, SearchPattern, TSearchOption.soTopDirectoryOnly);
 
       if (Length(Files) > 0) then
-        OpenDocumentAndHalt(Files[0])
-      else
-        begin
-          Files:= TDirectory.GetFiles(ADirectory, SearchPattern, TSearchOption.soAllDirectories);
+        OpenDocumentAndHalt(Files[0]);
+    end;
 
-          if (Length(Files) > 0) then
-            OpenDocumentAndHalt(Files[0]);
-        end;
+  for SearchPattern in SearchPatterns do
+    begin
+      Files:= TDirectory.GetFiles(ADirectory, SearchPattern, TSearchOption.soAllDirectories);
+
+      if (Length(Files) > 0) then
+        OpenDocumentAndHalt(Files[0]);
     end;
 
   ShowMessage('No default document found!');
