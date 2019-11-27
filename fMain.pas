@@ -56,11 +56,11 @@ type
     procedure RefreshGridColumns;
     procedure RefreshProjectCommandsDataSet;
     procedure SetFormHeight;
-    procedure SetFormPosition;
+    procedure SetFormPosition(const APreserveLeft: Boolean = False);
     function GetVisibleCommandCount: Integer;
     procedure SetFormWidth;
     function GetDefaultTortoiseProcFileName(const ATortoiseProcFileName: string): string;
-    procedure RecalcFormDimensionsAndPosition;
+    procedure RecalcFormDimensionsAndPosition(const APreserveLeft: Boolean = False);
     function ConfigurationRegKey: string;
     procedure HideGridScrollBar;
     function GetOrganizationName(ASourceDataSet: TDataSet): string;
@@ -405,7 +405,7 @@ begin
     GetVisibleCommandCount * CommandColumnWidth;
 end;
 
-procedure TfmMain.SetFormPosition;
+procedure TfmMain.SetFormPosition(const APreserveLeft: Boolean = False);
 
   function CalcLeft: Integer;
   begin
@@ -418,7 +418,10 @@ begin
   if FIsNearMousePosition then
     begin
       Position:= poDesigned;
-      Left:= CalcLeft;
+
+      if not APreserveLeft then
+        Left:= CalcLeft;
+
       Top:= Screen.Height - GetTaskBarHeight - Height;
     end;
 end;
@@ -594,7 +597,7 @@ begin
   cdsProjectCommands.Filtered:= False;
   pnlShowMore.Visible:= False;
   pnlConfig.Visible:= True;
-  RecalcFormDimensionsAndPosition;
+  RecalcFormDimensionsAndPosition(True);
   RefreshGridColumns;
 end;
 
@@ -655,11 +658,11 @@ begin
   grdProjectCommands.DefaultDrawColumnCell(Rect, DataCol, Column, []);
 end;
 
-procedure TfmMain.RecalcFormDimensionsAndPosition;
+procedure TfmMain.RecalcFormDimensionsAndPosition(const APreserveLeft: Boolean = False);
 begin
   SetFormHeight;
   SetFormWidth;
-  SetFormPosition;
+  SetFormPosition(APreserveLeft);
   HideGridScrollBar;
 end;
 
